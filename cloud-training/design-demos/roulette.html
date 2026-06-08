@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NL Cloud AI — Cinematic Sound-Viz</title>
+  <!-- Local-only: system fonts -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --muted: #888;
+      --grad: linear-gradient(90deg, #4f46e5, #7c3aed, #2563eb);
+      --mono: 'JetBrains Mono', 'SF Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    /* Waveform bands */
+    .wave-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35;
+    }
+    .wave-bg svg { width: 100%; height: 100%; }
+    .content { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    /* Hero — giant type crushing waveforms */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 4rem 0;
+      position: relative;
+    }
+    .hero-meta { font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin-bottom: 2rem; }
+    .hero h1 {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 span { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-sub { font-size: 1.15rem; color: #ccc; max-width: 52ch; font-weight: 300; margin-bottom: 3rem; }
+    .logo-strip { display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; opacity: 0.7; }
+    .logo-strip img { height: 28px; filter: brightness(0) invert(1); }
+
+    /* Section */
+    section { padding: 6rem 0; border-top: 1px solid #1a1a1a; }
+    .sec-label {
+      font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase;
+      color: #666; margin-bottom: 0.5rem;
+    }
+    .sec-label::before { content: '— '; }
+    h2 {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      line-height: 1.1;
+    }
+    p.lead { font-size: 1.05rem; color: #aaa; max-width: 60ch; margin-bottom: 2rem; font-weight: 300; }
+
+    /* Ladder */
+    .ladder { display: flex; flex-wrap: wrap; gap: 0; align-items: stretch; margin: 2rem 0; }
+    .ladder-step {
+      flex: 1; min-width: 120px; padding: 1.5rem 1rem; text-align: center;
+      border: 1px solid #222; position: relative;
+    }
+    .ladder-step .num { font-size: 0.55rem; letter-spacing: 0.2em; color: #555; margin-bottom: 0.5rem; }
+    .ladder-step .label { font-weight: 600; font-size: 0.9rem; }
+    .ladder-step .sub { font-size: 0.7rem; color: #666; margin-top: 0.25rem; }
+    .ladder-step::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: var(--grad); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s;
+    }
+    .ladder-step:hover::after { transform: scaleX(1); }
+
+    /* Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: #222; }
+    .grid-2 > div { background: #000; padding: 1.5rem; }
+    .grid-2 h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem; }
+    .grid-2 p, .grid-2 li { font-size: 0.85rem; color: #999; }
+    .grid-2 ul { list-style: none; }
+    .grid-2 li::before { content: '▸ '; color: #7c3aed; }
+
+    /* Code */
+    .code {
+      background: #0a0a0a; border: 1px solid #222; margin: 1.5rem 0; overflow: hidden;
+    }
+    .code-head {
+      display: flex; justify-content: space-between; padding: 0.5rem 1rem;
+      background: #111; border-bottom: 1px solid #222;
+      font-family: var(--mono); font-size: 0.7rem; color: #666;
+    }
+    .code pre {
+      padding: 1rem; overflow-x: auto; font-family: var(--mono);
+      font-size: 0.72rem; line-height: 1.55; color: #bbb;
+    }
+    .kw { color: #7c3aed; } .str { color: #60a5fa; } .cmt { color: #555; }
+
+    /* MCP stack */
+    .stack { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 2rem; }
+    .stack-box {
+      padding: 0.75rem 2rem; border: 1px solid #333; font-size: 0.8rem;
+      text-align: center; min-width: 200px;
+    }
+    .stack-box.accent { border-color: #7c3aed; background: rgba(124,58,237,0.08); }
+    .stack-arrow { color: #333; font-size: 1.2rem; }
+
+    /* Flow steps */
+    .flow { display: flex; flex-direction: column; gap: 0.5rem; }
+    .flow-step {
+      display: flex; align-items: center; gap: 1rem; padding: 1rem;
+      border-left: 3px solid transparent;
+      border-image: var(--grad) 1;
+      background: rgba(255,255,255,0.02);
+    }
+    .flow-step .n { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; font-weight: 800; color: #333; min-width: 2rem; }
+
+    /* Roadmap */
+    .roadmap { display: flex; flex-direction: column; gap: 0; }
+    .road-item {
+      display: grid; grid-template-columns: 80px 1fr; gap: 1rem;
+      padding: 1rem 0; border-bottom: 1px solid #1a1a1a;
+    }
+    .road-item .phase { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: #7c3aed; padding-top: 0.2rem; }
+
+    .degrade-note {
+      font-size: 0.65rem; color: #555; font-style: italic; margin-top: 3rem;
+      padding: 1rem; border: 1px dashed #333;
+    }
+
+    nav.sticky-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      border-bottom: 1px solid #1a1a1a; padding: 0.75rem 2rem;
+      display: flex; gap: 1.5rem; overflow-x: auto; font-size: 0.65rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    nav.sticky-nav a { color: #666; text-decoration: none; white-space: nowrap; }
+    nav.sticky-nav a:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="wave-bg" aria-hidden="true">
+  <svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="wg" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.6"/>
+        <stop offset="50%" stop-color="#7c3aed" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#2563eb" stop-opacity="0.4"/>
+      </linearGradient>
+    </defs>
+    <path d="M0,450 Q180,200 360,450 T720,450 T1080,450 T1440,450" fill="none" stroke="url(#wg)" stroke-width="2" opacity="0.5"/>
+    <path d="M0,500 Q200,300 400,500 T800,500 T1200,500 T1440,500" fill="none" stroke="url(#wg)" stroke-width="1.5" opacity="0.3"/>
+    <path d="M0,400 Q150,550 300,400 T600,400 T900,400 T1200,400 T1440,400" fill="none" stroke="url(#wg)" stroke-width="1" opacity="0.2"/>
+    <!-- static waveform approximation; real-time Web Audio spectrum not reproduced -->
+  </svg>
+</div>
+
+<nav class="sticky-nav">
+  <a href="#evolution">Evolution</a>
+  <a href="#mcp">MCP</a>
+  <a href="#environment">Environment</a>
+  <a href="#agent">Agent Mode</a>
+  <a href="#plugin">Plugin</a>
+  <a href="#wrapup">Wrap-up</a>
+</nav>
+
+<div class="content" style="padding-top: 3rem;">
+
+  <header class="hero">
+    <p class="hero-meta">IT Cloud Team · Enablement Session</p>
+    <h1>From LLMs<br>to <span>Agentic AI</span></h1>
+    <p class="hero-sub">How language models became autonomous agents — and how to build a custom GitHub Copilot plugin that ships infrastructure to Azure with OpenTofu.</p>
+    <div class="logo-strip">
+      <img src="../assets/logos/github.svg" alt="GitHub">
+      <img src="../assets/logos/copilot.svg" alt="Copilot">
+      <img src="../assets/logos/azure.svg" alt="Azure">
+      <img src="../assets/logos/vscode.svg" alt="VS Code">
+      <img src="../assets/logos/opentofu.svg" alt="OpenTofu">
+    </div>
+  </header>
+
+  <section id="evolution">
+    <p class="sec-label">Section 01</p>
+    <h2>Evolution</h2>
+    <p class="lead">An LLM is a pattern engine — not a database, not a reasoner with a will. Everything it knows is compressed into weights. The rest of this site is about giving it eyes, hands, and judgment.</p>
+
+    <div class="grid-2" style="margin-bottom: 3rem;">
+      <div><h3>The core idea</h3><p>A very large neural network trained to predict the next token. A brilliant pattern engine.</p></div>
+      <div><h3>Built-in limits</h3><ul><li>Frozen at a knowledge cutoff</li><li>No memory between calls</li><li>Cannot touch your systems</li><li>Can hallucinate confidently</li></ul></div>
+    </div>
+
+    <p class="sec-label">Five-step climb</p>
+    <div class="ladder">
+      <div class="ladder-step"><div class="num">01</div><div class="label">LLM</div><div class="sub">Predicts text</div></div>
+      <div class="ladder-step"><div class="num">02</div><div class="label">+ RAG</div><div class="sub">Adds knowledge</div></div>
+      <div class="ladder-step"><div class="num">03</div><div class="label">+ Tools</div><div class="sub">Takes action</div></div>
+      <div class="ladder-step"><div class="num">04</div><div class="label">+ MCP</div><div class="sub">Standard plumbing</div></div>
+      <div class="ladder-step"><div class="num">05</div><div class="label">Agent</div><div class="sub">Plans & adapts</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 2rem;">
+      <div><h3>Autonomy</h3><p>Pursues a goal across many steps without a human prompt for each one.</p></div>
+      <div><h3>Tool use</h3><p>Decides which tool to call, runs it, and reads the real result.</p></div>
+      <div><h3>Adaptation</h3><p>Uses feedback — errors, test failures — to correct its own course.</p></div>
+      <div><h3>Copilot modes</h3><p>Completions → Chat/Edit → <strong>Agent Mode</strong>: give a goal, it plans, edits, runs terminal, calls MCP, iterates.</p></div>
+    </div>
+  </section>
+
+  <section id="mcp">
+    <p class="sec-label">Section 02</p>
+    <h2>MCP — the USB-C for AI</h2>
+    <p class="lead">An open standard (Linux Foundation) defining one common way for AI clients to connect to tools and data. Build a connector once — every MCP-aware host can use it.</p>
+
+    <div class="grid-2" style="margin-bottom: 2rem;">
+      <div><h3>Before MCP</h3><p>N clients × M tools = N×M bespoke integrations. Brittle and unscalable.</p></div>
+      <div><h3>With MCP</h3><p>One protocol. N + M connectors. Any client, any server, plug-and-play.</p></div>
+    </div>
+
+    <div class="stack">
+      <div class="stack-box accent">VSCode + Copilot — Host</div>
+      <div class="stack-arrow">↓</div>
+      <div style="display:flex;gap:0.5rem;">
+        <div class="stack-box">Client A</div>
+        <div class="stack-box">Client B</div>
+        <div class="stack-box">Client C</div>
+      </div>
+      <div class="stack-arrow">↓ JSON-RPC 2.0 · stdio or HTTP</div>
+      <div style="display:flex;gap:0.5rem;">
+        <div class="stack-box accent">GitHub</div>
+        <div class="stack-box accent">Azure</div>
+        <div class="stack-box accent">Terraform</div>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:#555;margin-top:1rem;text-align:center;">Servers expose: <strong style="color:#888">Tools</strong> (actions) · <strong style="color:#888">Resources</strong> (data) · <strong style="color:#888">Prompts</strong> (workflows)</p>
+  </section>
+
+  <section id="environment">
+    <p class="sec-label">Section 03</p>
+    <h2>Cloud engineer workbench</h2>
+    <div class="grid-2">
+      <div><h3>VSCode extensions</h3><ul><li>GitHub Copilot + Agent Mode</li><li>HashiCorp Terraform / OpenTofu HCL</li><li>Azure Tools + Azure CLI</li><li>Dev Containers</li></ul></div>
+      <div><h3>Cloud + IaC stack</h3><ul><li>OpenTofu CLI</li><li>Azure CLI authenticated</li><li>azurerm provider + remote Blob state</li><li>Service principal for CI</li></ul></div>
+    </div>
+
+    <div class="code">
+      <div class="code-head"><span>main.tf</span><span>hcl</span></div>
+      <pre><span class="kw">terraform</span> {
+  <span class="kw">required_version</span> = <span class="str">">= 1.7.0"</span>
+  <span class="kw">backend</span> <span class="str">"azurerm"</span> {
+    <span class="kw">resource_group_name</span>  = <span class="str">"rg-tfstate"</span>
+    <span class="kw">storage_account_name</span> = <span class="str">"sttfstateteam"</span>
+    <span class="kw">container_name</span>       = <span class="str">"tfstate"</span>
+    <span class="kw">key</span>                  = <span class="str">"platform.tfstate"</span>
+  }
+}</pre>
+    </div>
+
+    <div class="code">
+      <div class="code-head"><span>.vscode/mcp.json</span><span>json</span></div>
+      <pre>{
+  <span class="str">"servers"</span>: {
+    <span class="str">"github"</span>: { <span class="str">"type"</span>: <span class="str">"http"</span>, <span class="str">"url"</span>: <span class="str">"https://api.githubcopilot.com/mcp/"</span> },
+    <span class="str">"azure"</span>: { <span class="str">"type"</span>: <span class="str">"stdio"</span>, <span class="str">"command"</span>: <span class="str">"npx"</span>, <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@azure/mcp@latest"</span>, <span class="str">"server"</span>, <span class="str">"start"</span>] },
+    <span class="str">"terraform"</span>: { <span class="str">"type"</span>: <span class="str">"stdio"</span>, <span class="str">"command"</span>: <span class="str">"docker"</span>, <span class="str">"args"</span>: [<span class="str">"run"</span>, <span class="str">"-i"</span>, <span class="str">"--rm"</span>, <span class="str">"hashicorp/terraform-mcp-server"</span>] }
+  }
+}</pre>
+    </div>
+  </section>
+
+  <section id="agent">
+    <p class="sec-label">Section 04</p>
+    <h2>A request, end to end</h2>
+    <p class="lead" style="font-family:var(--mono);font-size:0.9rem;color:#7c3aed;">"Stand up a dev AKS landing zone and open a PR."</p>
+    <div class="flow">
+      <div class="flow-step"><span class="n">1</span><span>Instructions inject your standards (naming, tagging, region policy).</span></div>
+      <div class="flow-step"><span class="n">2</span><span>Planner queries Azure MCP + Terraform MCP for resources and module docs.</span></div>
+      <div class="flow-step"><span class="n">3</span><span>Implementer scaffolds .tf files via the OpenTofu skill.</span></div>
+      <div class="flow-step"><span class="n">4</span><span>PreToolUse hook runs tofu validate + policy check before apply.</span></div>
+      <div class="flow-step"><span class="n">5</span><span>GitHub MCP opens a pull request with plan output attached.</span></div>
+    </div>
+  </section>
+
+  <section id="plugin">
+    <p class="sec-label">Section 05</p>
+    <h2>Build the plugin</h2>
+    <div class="grid-2">
+      <div><h3>Instructions</h3><p>Always-on rules via applyTo globs.</p></div>
+      <div><h3>Skills</h3><p>Auto-discovered procedures when relevant.</p></div>
+      <div><h3>Custom agents</h3><p>Planner (read-only) → Implementer (writes + apply).</p></div>
+      <div><h3>Hooks</h3><p>Deterministic guardrails — block apply without approved plan.</p></div>
+    </div>
+
+    <div class="code">
+      <div class="code-head"><span>plugin.json</span><span>json</span></div>
+      <pre>{
+  <span class="str">"name"</span>: <span class="str">"azure-iac-plugin"</span>,
+  <span class="str">"displayName"</span>: <span class="str">"Azure IaC Copilot"</span>,
+  <span class="str">"contributes"</span>: {
+    <span class="str">"agents"</span>: [<span class="str">"./agents"</span>], <span class="str">"skills"</span>: [<span class="str">"./skills"</span>],
+    <span class="str">"instructions"</span>: [<span class="str">"./instructions"</span>], <span class="str">"mcpServers"</span>: <span class="str">"./.mcp.json"</span>,
+    <span class="str">"hooks"</span>: <span class="str">"./hooks/hooks.json"</span>
+  }
+}</pre>
+    </div>
+  </section>
+
+  <section id="wrapup">
+    <p class="sec-label">Section 06</p>
+    <h2>Adoption roadmap</h2>
+    <div class="roadmap">
+      <div class="road-item"><span class="phase">Phase 1</span><span>Standardize workspace — extensions, OpenTofu, dev container.</span></div>
+      <div class="road-item"><span class="phase">Phase 2</span><span>Add MCP servers: GitHub, Azure, Terraform. Test in Agent Mode.</span></div>
+      <div class="road-item"><span class="phase">Phase 3</span><span>Author instructions encoding IaC & naming standards.</span></div>
+      <div class="road-item"><span class="phase">Phase 4</span><span>Build skills + planner/implementer agent team.</span></div>
+      <div class="road-item"><span class="phase">Phase 5</span><span>Add hooks for validation and destructive-action guardrails.</span></div>
+      <div class="road-item"><span class="phase">Phase 6</span><span>Package as plugin; publish internally for the whole team.</span></div>
+    </div>
+    <p style="margin-top:3rem;font-family:system-ui,sans-serif;font-size:1.5rem;font-weight:800;">Let's build the Azure IaC Copilot plugin together.</p>
+  </section>
+
+  <p class="degrade-note">Style note (Cinematic Sound-Viz, 72% fidelity): Waveforms are static SVG approximations with CSS-ready structure — real-time Web Audio/Canvas spectrum not reproduced in pure HTML.</p>
+
+</div>
+</body>
+</html>

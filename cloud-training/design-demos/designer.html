@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NL Cloud AI — Stripe Press Editorial</title>
+  <!-- Local-only: system fonts -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #FBFAF8;
+      --ink: #1a1a2e;
+      --stripe: #635BFF;
+      --terra: #CC785C;
+      --muted: #6b6b7b;
+      --border: #e8e6e1;
+      --serif: Georgia, 'Times New Roman', Times, serif;
+      --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: 'SF Mono', 'Fira Code', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--cream); color: var(--ink); line-height: 1.65; }
+
+    /* Stripe Press / editorial longform */
+    .hero-band {
+      background: linear-gradient(135deg, #635BFF 0%, #4EA7FC 40%, #B59AFF 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+      padding: 5rem 2rem 8rem;
+      color: #fff;
+    }
+    .hero-inner { max-width: 1100px; margin: 0 auto; }
+    .hero-eyebrow { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.8; margin-bottom: 1.5rem; }
+    .hero-band h1 {
+      font-family: var(--serif); font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; max-width: 14ch;
+      margin-bottom: 1.5rem;
+    }
+    .hero-band .lead { font-size: 1.1rem; max-width: 48ch; opacity: 0.9; font-weight: 400; line-height: 1.55; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    /* Sticky chapter nav */
+    .chapters {
+      display: flex; gap: 0; overflow-x: auto; margin: -3rem 0 3rem;
+      background: #fff; border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .chapters a {
+      flex: 1; min-width: 120px; padding: 1rem; text-align: center; text-decoration: none;
+      color: var(--muted); font-size: 0.75rem; font-weight: 500; border-right: 1px solid var(--border);
+      transition: color 0.2s, background 0.2s;
+    }
+    .chapters a:last-child { border-right: none; }
+    .chapters a:hover { color: var(--stripe); background: #faf9ff; }
+
+    section { padding: 4rem 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .chapter-num { font-family: var(--serif); font-size: 3rem; font-weight: 700; color: var(--border); line-height: 1; margin-bottom: 0.5rem; }
+    h2 { font-family: var(--serif); font-size: 2.25rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 1rem; line-height: 1.15; }
+    h3 { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.75rem; }
+    p { color: #444; margin-bottom: 1rem; max-width: 68ch; }
+    p.prose { font-family: var(--serif); font-size: 1.05rem; line-height: 1.75; }
+
+    /* Inline metric cards — Stripe annual letter style */
+    .metric-row { display: flex; flex-wrap: wrap; gap: 1rem; margin: 2rem 0; }
+    .metric {
+      background: #fff; border: 1px solid var(--border); padding: 1.25rem 1.5rem;
+      flex: 1; min-width: 140px;
+    }
+    .metric .val { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--stripe); line-height: 1; }
+    .metric .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
+
+    .logos { display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; padding: 2rem 0; }
+    .logos img { height: 26px; opacity: 0.85; }
+
+    /* Two-column prose + aside */
+    .split { display: grid; grid-template-columns: 1fr 280px; gap: 3rem; align-items: start; }
+    @media (max-width: 800px) { .split { grid-template-columns: 1fr; } }
+    aside.sidebar {
+      background: #fff; border: 1px solid var(--border); padding: 1.25rem;
+      position: sticky; top: 2rem;
+    }
+    aside.sidebar h4 { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+    aside.sidebar ul { list-style: none; font-size: 0.85rem; }
+    aside.sidebar li { padding: 0.35rem 0; border-bottom: 1px solid var(--border); color: #555; }
+    aside.sidebar li:last-child { border-bottom: none; }
+
+    /* Evolution timeline */
+    .timeline { margin: 2rem 0; border-left: 2px solid var(--stripe); padding-left: 2rem; }
+    .timeline-item { margin-bottom: 1.5rem; position: relative; }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -2.35rem; top: 0.4rem;
+      width: 10px; height: 10px; border-radius: 50%; background: var(--stripe);
+    }
+    .timeline-item strong { display: block; font-weight: 600; margin-bottom: 0.15rem; }
+    .timeline-item span { font-size: 0.85rem; color: var(--muted); }
+
+    /* Code — warm editorial */
+    .code {
+      background: #fff; border: 1px solid var(--border); margin: 1.5rem 0;
+      border-radius: 4px; overflow: hidden;
+    }
+    .code .bar {
+      padding: 0.5rem 1rem; background: var(--cream); border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+      display: flex; justify-content: space-between;
+    }
+    .code pre { padding: 1rem; overflow-x: auto; font-family: var(--mono); font-size: 0.75rem; line-height: 1.6; color: #333; }
+
+    /* Bento feature grid */
+    .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 2rem 0; }
+    @media (max-width: 700px) { .bento { grid-template-columns: 1fr; } }
+    .bento .cell {
+      background: #fff; border: 1px solid var(--border); padding: 1.25rem;
+    }
+    .bento .cell.wide { grid-column: span 2; }
+    @media (max-width: 700px) { .bento .cell.wide { grid-column: span 1; } }
+    .bento .cell h4 { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
+    .bento .cell p { font-size: 0.8rem; color: var(--muted); margin: 0; max-width: none; }
+
+    /* Pull quote */
+    .pullquote {
+      font-family: var(--serif); font-size: 1.5rem; font-weight: 600; font-style: italic;
+      color: var(--terra); border-left: 3px solid var(--terra);
+      padding: 0.5rem 0 0.5rem 1.5rem; margin: 2rem 0; max-width: 50ch; line-height: 1.4;
+    }
+
+    /* CTA */
+    .cta {
+      background: var(--ink); color: #fff; padding: 3rem 2rem; margin-top: 4rem;
+      text-align: center;
+    }
+    .cta h2 { color: #fff; font-size: 2rem; margin-bottom: 0.75rem; }
+    .cta p { color: rgba(255,255,255,0.7); margin: 0 auto; }
+
+    .designer-credit { font-size: 0.7rem; color: var(--muted); margin-top: 3rem; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<div class="hero-band">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">IT Cloud Team · Enablement</p>
+    <h1>From LLMs to Agentic AI</h1>
+    <p class="lead">A narrative guide to how language models became autonomous agents — and how your team can ship a governed Azure IaC Copilot plugin with OpenTofu.</p>
+  </div>
+</div>
+
+<div class="container">
+  <nav class="chapters">
+    <a href="#ch1">Evolution</a>
+    <a href="#ch2">MCP</a>
+    <a href="#ch3">Workbench</a>
+    <a href="#ch4">Agent Mode</a>
+    <a href="#ch5">Plugin</a>
+    <a href="#ch6">Roadmap</a>
+  </nav>
+
+  <div class="logos">
+    <img src="../assets/logos/github.svg" alt="GitHub">
+    <img src="../assets/logos/copilot.svg" alt="Copilot">
+    <img src="../assets/logos/azure.svg" alt="Azure">
+    <img src="../assets/logos/vscode.svg" alt="VS Code">
+    <img src="../assets/logos/opentofu.svg" alt="OpenTofu">
+    <img src="../assets/logos/terraform.svg" alt="Terraform">
+  </div>
+
+  <section id="ch1">
+    <div class="split">
+      <div>
+        <div class="chapter-num">I</div>
+        <h2>The evolution of intelligence</h2>
+        <p class="prose">An LLM is not a database and not a reasoner with a will. It is a very large neural network trained to predict the next token — a brilliant pattern engine whose knowledge is frozen at a cutoff, with no memory between calls and no ability to touch your systems.</p>
+        <p class="pullquote">A raw model is a powerful brain in a jar. Tools, context, and a loop turn it into an agent.</p>
+
+        <div class="timeline">
+          <div class="timeline-item"><strong>LLM</strong><span>Predicts text from patterns in weights</span></div>
+          <div class="timeline-item"><strong>+ RAG</strong><span>Retrieves your docs at query time for grounded answers</span></div>
+          <div class="timeline-item"><strong>+ Tools</strong><span>Calls functions — read files, run queries, hit APIs</span></div>
+          <div class="timeline-item"><strong>+ MCP</strong><span>Standardizes how tools plug in — build once, use everywhere</span></div>
+          <div class="timeline-item"><strong>Agent</strong><span>Closes the loop: plan, act, observe, adapt until done</span></div>
+        </div>
+
+        <h3>What makes a system agentic?</h3>
+        <p>Autonomy across many steps. Tool use with real results. Adaptation from errors and test failures. In Copilot, this manifests as Agent Mode — give a goal, it plans, edits files, runs terminal commands, calls MCP tools, and iterates.</p>
+      </div>
+      <aside class="sidebar">
+        <h4>Agentic traits</h4>
+        <ul>
+          <li>Autonomy</li>
+          <li>Tool use</li>
+          <li>Adaptation</li>
+          <li>Multi-step planning</li>
+        </ul>
+        <h4 style="margin-top:1.5rem;">Copilot modes</h4>
+        <ul>
+          <li>Completions</li>
+          <li>Chat / Edit</li>
+          <li>Agent Mode ← target</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section id="ch2">
+    <div class="chapter-num">II</div>
+    <h2>Model Context Protocol</h2>
+    <p class="prose">MCP is the USB-C for AI — an open standard under the Linux Foundation that replaces N×M bespoke integrations with one protocol. Any MCP-aware host connects to any server via JSON-RPC 2.0 over stdio or HTTP.</p>
+
+    <div class="metric-row">
+      <div class="metric"><div class="val">3</div><div class="lbl">Roles: Host · Client · Server</div></div>
+      <div class="metric"><div class="val">3</div><div class="lbl">Primitives: Tools · Resources · Prompts</div></div>
+      <div class="metric"><div class="val">1</div><div class="lbl">Protocol for all connectors</div></div>
+    </div>
+
+    <div class="bento">
+      <div class="cell wide"><h4>Before MCP</h4><p>N clients × M tools = N×M bespoke integrations. Brittle, unscalable, unmaintainable.</p></div>
+      <div class="cell"><h4>With MCP</h4><p>One protocol. Plug-and-play.</p></div>
+      <div class="cell"><h4>GitHub MCP</h4><p>Issues, PRs, repo search, Actions</p></div>
+      <div class="cell"><h4>Azure MCP</h4><p>Subscriptions, resources, AKS, KQL</p></div>
+      <div class="cell"><h4>Terraform MCP</h4><p>Registry, modules, provider docs</p></div>
+    </div>
+  </section>
+
+  <section id="ch3">
+    <div class="chapter-num">III</div>
+    <h2>The cloud engineer workbench</h2>
+    <p>VSCode with Copilot Agent Mode, OpenTofu CLI, Azure CLI, and Dev Containers — wired together through MCP so the agent reads state, plans changes, and applies them safely in version control.</p>
+
+    <div class="code">
+      <div class="bar"><span>main.tf</span><span>HCL</span></div>
+      <pre>terraform {
+  required_version = ">= 1.7.0"
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstateteam"
+    container_name       = "tfstate"
+    key                  = "platform.tfstate"
+  }
+}</pre>
+    </div>
+
+    <div class="code">
+      <div class="bar"><span>.vscode/mcp.json</span><span>JSON</span></div>
+      <pre>{
+  "servers": {
+    "github": { "type": "http", "url": "https://api.githubcopilot.com/mcp/" },
+    "azure": { "type": "stdio", "command": "npx", "args": ["-y", "@azure/mcp@latest", "server", "start"] },
+    "terraform": { "type": "stdio", "command": "docker", "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"] }
+  }
+}</pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);">Workflow: <code style="font-family:var(--mono);">tofu init → tofu plan → tofu apply</code>. Remote state means agent and team share one source of truth.</p>
+  </section>
+
+  <section id="ch4">
+    <div class="chapter-num">IV</div>
+    <h2>A request, end to end</h2>
+    <p class="pullquote" style="font-style:normal;font-family:var(--mono);font-size:1rem;color:var(--stripe);">"Stand up a dev AKS landing zone and open a PR."</p>
+
+    <div class="timeline">
+      <div class="timeline-item"><strong>Instructions</strong><span>Inject naming, tagging, and region policy standards</span></div>
+      <div class="timeline-item"><strong>Planner</strong><span>Queries Azure MCP + Terraform MCP for estate and module docs</span></div>
+      <div class="timeline-item"><strong>Implementer</strong><span>Scaffolds .tf files via the OpenTofu skill</span></div>
+      <div class="timeline-item"><strong>Hook</strong><span>PreToolUse runs tofu validate + policy check before apply</span></div>
+      <div class="timeline-item"><strong>GitHub MCP</strong><span>Opens PR with plan output attached</span></div>
+    </div>
+  </section>
+
+  <section id="ch5">
+    <div class="chapter-num">V</div>
+    <h2>Building the plugin</h2>
+    <p>Six customization layers bundle into one shippable unit: Instructions, Prompt files, Skills, Custom agents, MCP servers, and Hooks.</p>
+
+    <div class="bento">
+      <div class="cell"><h4>Instructions</h4><p>Always-on rules via applyTo globs</p></div>
+      <div class="cell"><h4>Skills</h4><p>Auto-discovered when task matches</p></div>
+      <div class="cell"><h4>Agents</h4><p>Planner → Implementer handoffs</p></div>
+      <div class="cell wide"><h4>Hooks</h4><p>Deterministic scripts on lifecycle events — block apply without approved plan</p></div>
+      <div class="cell"><h4>MCP</h4><p>Live tool connections</p></div>
+      <div class="cell"><h4>Security</h4><p>Trust sources, Key Vault secrets, human in the loop</p></div>
+    </div>
+
+    <div class="code">
+      <div class="bar"><span>plugin.json</span><span>JSON</span></div>
+      <pre>{
+  "name": "azure-iac-plugin",
+  "displayName": "Azure IaC Copilot",
+  "version": "1.0.0",
+  "publisher": "cloud-team",
+  "contributes": {
+    "agents": ["./agents"], "skills": ["./skills"],
+    "instructions": ["./instructions"], "mcpServers": "./.mcp.json",
+    "hooks": "./hooks/hooks.json"
+  }
+}</pre>
+    </div>
+  </section>
+
+  <section id="ch6">
+    <div class="chapter-num">VI</div>
+    <h2>Adoption roadmap</h2>
+    <div class="timeline">
+      <div class="timeline-item"><strong>Phase 1</strong><span>Standardize workspace</span></div>
+      <div class="timeline-item"><strong>Phase 2</strong><span>Add MCP servers, test Agent Mode</span></div>
+      <div class="timeline-item"><strong>Phase 3</strong><span>Author instructions for IaC standards</span></div>
+      <div class="timeline-item"><strong>Phase 4</strong><span>Build skills + agent team</span></div>
+      <div class="timeline-item"><strong>Phase 5</strong><span>Add validation hooks</span></div>
+      <div class="timeline-item"><strong>Phase 6</strong><span>Package and publish internally</span></div>
+    </div>
+  </section>
+</div>
+
+<div class="cta">
+  <h2>Let's build the Azure IaC Copilot plugin together.</h2>
+  <p>An LLM is a pattern engine. MCP is the universal connector. A plugin bundles it all into one shippable unit.</p>
+</div>
+
+<p class="container designer-credit">Design philosophy: Stripe Press editorial × Collins information design — publication-grade reading rhythm, inline data cards, warm cream base with restrained brand accent. Suited for authoritative technical narrative.</p>
+
+</body>
+</html>

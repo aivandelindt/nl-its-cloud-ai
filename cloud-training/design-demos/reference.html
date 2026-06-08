@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NL Cloud AI — Geist Docs</title>
+  <!-- Local-only: system fonts -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #fff; --fg: #000; --muted: #888; --border: #eaeaea;
+      --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--fg); font-size: 14px; line-height: 1.6; }
+
+    /* Vercel Geist docs layout: sidebar + main */
+    .layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } }
+
+    aside {
+      border-right: 1px solid var(--border); padding: 1.5rem 1rem;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    aside .brand { font-weight: 600; font-size: 13px; margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+    aside .sub { font-size: 11px; color: var(--muted); margin-bottom: 2rem; }
+    aside nav a {
+      display: block; padding: 0.35rem 0.5rem; font-size: 13px; color: var(--muted);
+      text-decoration: none; border-radius: 0;
+    }
+    aside nav a:hover, aside nav a.active { color: var(--fg); background: #fafafa; }
+    aside nav .group { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 0.5rem 0.5rem; }
+
+    main { max-width: 720px; padding: 3rem 3rem 6rem; }
+    @media (max-width: 768px) { main { padding: 2rem 1.25rem; } aside { display: none; } }
+
+    h1 { font-size: 2.5rem; font-weight: 600; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 1rem; }
+    h2 { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.03em; margin: 3rem 0 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+    p { color: #444; margin-bottom: 1rem; max-width: 65ch; }
+    .desc { font-size: 1.05rem; color: var(--muted); margin-bottom: 2rem; max-width: 55ch; }
+
+    .logos { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin: 2rem 0; padding: 1.5rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .logos img { height: 22px; }
+
+    /* Geist table */
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 13px; }
+    th, td { text-align: left; padding: 0.6rem 0.75rem; border: 1px solid var(--border); }
+    th { background: #fafafa; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Code block — Geist style */
+    .code-block { border: 1px solid var(--border); margin: 1rem 0; border-radius: 0; overflow: hidden; }
+    .code-block .head { display: flex; justify-content: space-between; padding: 0.4rem 0.75rem; background: #fafafa; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .code-block pre { padding: 0.75rem; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.55; background: #fafafa; }
+
+    /* Grid cards — sharp corners */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--border); margin: 1rem 0; }
+    .card-grid > div { background: var(--bg); padding: 1rem; }
+    .card-grid .title { font-weight: 600; font-size: 13px; margin-bottom: 0.25rem; }
+    .card-grid .body { font-size: 12px; color: var(--muted); }
+
+    /* Ladder — horizontal */
+    .ladder { display: flex; border: 1px solid var(--border); margin: 1.5rem 0; }
+    .ladder > div { flex: 1; padding: 1rem 0.75rem; border-right: 1px solid var(--border); text-align: center; }
+    .ladder > div:last-child { border-right: none; }
+    .ladder .step { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .ladder .name { font-weight: 600; font-size: 13px; margin: 0.25rem 0; }
+    .ladder .hint { font-size: 11px; color: var(--muted); }
+
+    /* Callout */
+    .callout { border-left: 2px solid var(--fg); padding: 0.75rem 1rem; margin: 1.5rem 0; background: #fafafa; font-size: 13px; }
+    .callout strong { font-weight: 600; }
+
+    /* Flow list */
+    ol.steps { list-style: none; counter-reset: step; margin: 1rem 0; }
+    ol.steps li { counter-increment: step; padding: 0.75rem 0; border-bottom: 1px solid var(--border); font-size: 13px; color: #444; display: flex; gap: 1rem; }
+    ol.steps li::before { content: counter(step); font-family: var(--mono); font-size: 11px; color: var(--muted); min-width: 1.5rem; }
+
+    .badge { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 0.15rem 0.4rem; border: 1px solid var(--border); margin-right: 0.35rem; }
+
+    footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand">NL Cloud AI</div>
+    <div class="sub">IT Cloud Team Enablement</div>
+    <nav>
+      <div class="group">Overview</div>
+      <a href="#intro" class="active">Introduction</a>
+      <div class="group">Concepts</div>
+      <a href="#evolution">Evolution</a>
+      <a href="#mcp">Model Context Protocol</a>
+      <div class="group">Setup</div>
+      <a href="#environment">Environment</a>
+      <a href="#agent">Agent Mode</a>
+      <div class="group">Build</div>
+      <a href="#plugin">Custom Plugin</a>
+      <a href="#roadmap">Roadmap</a>
+    </nav>
+  </aside>
+
+  <main>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:0.5rem;">Reference: vercel.com/geist · Swiss Monochrome</p>
+    <h1 id="intro">From LLMs to Agentic AI</h1>
+    <p class="desc">A hands-on enablement session for the IT Cloud Team — how language models became autonomous agents, and how to build a custom GitHub Copilot plugin that ships infrastructure to Azure with OpenTofu.</p>
+
+    <div>
+      <span class="badge">LLM</span>
+      <span class="badge">MCP</span>
+      <span class="badge">Agent Mode</span>
+      <span class="badge">OpenTofu</span>
+      <span class="badge">Azure</span>
+    </div>
+
+    <div class="logos">
+      <img src="../assets/logos/github.svg" alt="GitHub">
+      <img src="../assets/logos/copilot.svg" alt="Copilot">
+      <img src="../assets/logos/azure.svg" alt="Azure">
+      <img src="../assets/logos/vscode.svg" alt="VS Code">
+      <img src="../assets/logos/opentofu.svg" alt="OpenTofu">
+      <img src="../assets/logos/terraform.svg" alt="Terraform">
+    </div>
+
+    <h2 id="evolution">Evolution</h2>
+    <h3>What an LLM actually is</h3>
+    <p>An LLM is a very large neural network trained to predict the next token. Everything it "knows" is compressed into weights. It is a brilliant pattern engine — not a database, not a reasoner with a will.</p>
+
+    <div class="card-grid">
+      <div><div class="title">Knowledge cutoff</div><div class="body">Frozen at training time</div></div>
+      <div><div class="title">No memory</div><div class="body">Between calls</div></div>
+      <div><div class="title">No system access</div><div class="body">Cannot touch your infra</div></div>
+      <div><div class="title">Hallucination</div><div class="body">Confident but wrong</div></div>
+    </div>
+
+    <div class="callout"><strong>Takeaway:</strong> A raw model is a powerful brain in a jar. Tools, context, and a loop turn it into an agent.</div>
+
+    <h3>The five-step climb</h3>
+    <div class="ladder">
+      <div><div class="step">01</div><div class="name">LLM</div><div class="hint">Predicts text</div></div>
+      <div><div class="step">02</div><div class="name">+ RAG</div><div class="hint">Adds knowledge</div></div>
+      <div><div class="step">03</div><div class="name">+ Tools</div><div class="hint">Takes action</div></div>
+      <div><div class="step">04</div><div class="name">+ MCP</div><div class="hint">Standard plumbing</div></div>
+      <div><div class="step">05</div><div class="name">Agent</div><div class="hint">Plans & adapts</div></div>
+    </div>
+
+    <h3>Copilot: autocomplete to coworker</h3>
+    <table>
+      <tr><th>Mode</th><th>Behavior</th></tr>
+      <tr><td>Completions</td><td>Suggests next line as you type</td></tr>
+      <tr><td>Chat / Edit</td><td>Ask questions, refactor across files</td></tr>
+      <tr><td>Agent Mode</td><td>Give a goal — plans, edits, runs terminal, calls MCP, iterates</td></tr>
+    </table>
+
+    <h2 id="mcp">Model Context Protocol</h2>
+    <p>MCP is an open standard (Linux Foundation) defining one common way for AI clients to connect to tools and data. Build a connector once — every MCP-aware host can use it.</p>
+
+    <div class="card-grid">
+      <div><div class="title">Host</div><div class="body">VSCode + Copilot — where the user works</div></div>
+      <div><div class="title">Client</div><div class="body">One per server connection in the host</div></div>
+      <div><div class="title">Server</div><div class="body">Exposes Tools, Resources, Prompts</div></div>
+    </div>
+    <p style="font-family:var(--mono);font-size:12px;color:var(--muted);">Transport: JSON-RPC 2.0 over stdio (local) or HTTP/SSE (remote)</p>
+
+    <h2 id="environment">Environment</h2>
+    <h3>OpenTofu + Azure baseline</h3>
+    <div class="code-block">
+      <div class="head"><span>main.tf</span><span>HCL</span></div>
+      <pre>terraform {
+  required_version = ">= 1.7.0"
+  required_providers {
+    azurerm = { source = "hashicorp/azurerm", version = "~> 4.0" }
+  }
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstateteam"
+    container_name       = "tfstate"
+    key                  = "platform.tfstate"
+  }
+}</pre>
+    </div>
+
+    <h3>MCP server wiring</h3>
+    <div class="code-block">
+      <div class="head"><span>.vscode/mcp.json</span><span>JSON</span></div>
+      <pre>{
+  "servers": {
+    "github": { "type": "http", "url": "https://api.githubcopilot.com/mcp/" },
+    "azure": { "type": "stdio", "command": "npx",
+      "args": ["-y", "@azure/mcp@latest", "server", "start"] },
+    "terraform": { "type": "stdio", "command": "docker",
+      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"] }
+  }
+}</pre>
+    </div>
+
+    <h2 id="agent">Agent Mode walkthrough</h2>
+    <p style="font-family:var(--mono);font-size:13px;">Prompt: "Stand up a dev AKS landing zone and open a PR."</p>
+    <ol class="steps">
+      <li>Instructions inject your standards (naming, tagging, region policy)</li>
+      <li>Planner queries Azure MCP + Terraform MCP for resources and docs</li>
+      <li>Implementer scaffolds .tf files via the OpenTofu skill</li>
+      <li>PreToolUse hook runs tofu validate + policy check before apply</li>
+      <li>GitHub MCP opens a pull request with plan output attached</li>
+    </ol>
+
+    <h2 id="plugin">Custom Copilot plugin</h2>
+    <p>Six layers: Instructions · Prompt files · Skills · Custom agents · MCP servers · Hooks</p>
+
+    <div class="code-block">
+      <div class="head"><span>plugin.json</span><span>JSON</span></div>
+      <pre>{
+  "name": "azure-iac-plugin",
+  "displayName": "Azure IaC Copilot",
+  "version": "1.0.0",
+  "description": "Plan & ship Azure infra with OpenTofu",
+  "publisher": "cloud-team",
+  "contributes": {
+    "agents": ["./agents"], "skills": ["./skills"],
+    "instructions": ["./instructions"], "prompts": ["./prompts"],
+    "mcpServers": "./.mcp.json", "hooks": "./hooks/hooks.json"
+  }
+}</pre>
+    </div>
+
+    <div class="callout"><strong>Security:</strong> Trust MCP sources. Secrets via Key Vault. Human in the loop for destructive ops. Hooks enforce deterministically.</div>
+
+    <h2 id="roadmap">Adoption roadmap</h2>
+    <table>
+      <tr><th>Phase</th><th>Action</th></tr>
+      <tr><td>1</td><td>Standardize workspace — extensions, OpenTofu, dev container</td></tr>
+      <tr><td>2</td><td>Add MCP servers: GitHub, Azure, Terraform</td></tr>
+      <tr><td>3</td><td>Author instructions for IaC & naming standards</td></tr>
+      <tr><td>4</td><td>Build skills + planner/implementer agent team</td></tr>
+      <tr><td>5</td><td>Add hooks for validation and guardrails</td></tr>
+      <tr><td>6</td><td>Package as plugin; publish internally</td></tr>
+    </table>
+
+    <footer>
+      Reference case: <a href="https://vercel.com/geist" style="color:var(--fg);">Vercel Geist Design System</a> — Swiss monochrome, sharp corners, Geist Sans + Mono.<br>
+      Verify manifest keys against current docs before rollout.
+    </footer>
+  </main>
+</div>
+</body>
+</html>

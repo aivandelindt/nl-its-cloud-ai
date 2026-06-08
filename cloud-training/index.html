@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>From LLMs to Agentic AI — IT Cloud Team</title>
+  <!-- Local-only: system fonts + relative assets; no CDN or network required -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --serif: Georgia, 'Times New Roman', Times, serif;
+      --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      --bg: #f7faf8;
+      --surface: #ffffff;
+      --surface-hover: #edf5f0;
+      --surface-accent: #e8f5ee;
+      --ink: #122018;
+      --text: #3d4f44;
+      --text-secondary: #5c6e62;
+      --muted: #6b7f72;
+      --border: #dce8e0;
+      --chapter-num: #c5d9cc;
+      --accent: #0d9668;
+      --accent-bright: #14bf96;
+      --surface-muted: #f0f7f3;
+      --code-bg: #f0f7f3;
+      --quote: #2d6a4f;
+      --warn: #b45309;
+      --warn-border: #fde68a;
+      --hero-grad: linear-gradient(135deg, #0a5c4b 0%, #14bf96 45%, #4ade80 100%);
+      --code-text: #2a3d32;
+      --code-bar: #f0f7f3;
+      --cta-bg: #0a2818;
+      --shadow: rgba(10, 40, 24, 0.08);
+      --hero-text: #ffffff;
+    }
+    [data-theme="dark"] {
+      --bg: #0b100e;
+      --surface: #141c17;
+      --surface-hover: #1c2821;
+      --surface-accent: #1a2e24;
+      --ink: #e8f0eb;
+      --text: #b0c4b6;
+      --text-secondary: #8fa396;
+      --muted: #6d8578;
+      --border: #243530;
+      --chapter-num: #2a3d32;
+      --accent: #2dd4a0;
+      --accent-bright: #4ade80;
+      --quote: #6ee7b7;
+      --hero-grad: linear-gradient(135deg, #052318 0%, #0a5c4b 42%, #148f6a 100%);
+      --code-text: #c8d8cc;
+      --code-bar: #111a14;
+      --cta-bg: #061410;
+      --shadow: rgba(0, 0, 0, 0.4);
+      --hero-text: #f0fdf4;
+      --surface-muted: #111a14;
+      --code-bg: #111a14;
+      --warn: #fbbf24;
+      --warn-border: #3d3520;
+    }
+    html { scroll-behavior: smooth; color-scheme: light; }
+    [data-theme="dark"] { color-scheme: dark; }
+    body {
+      font-family: var(--sans); background: var(--bg); color: var(--ink);
+      line-height: 1.65; transition: background 0.25s, color 0.25s;
+    }
+
+    .theme-toggle {
+      position: fixed; top: 1rem; right: 1rem; z-index: 200;
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 0.85rem; border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 999px; background: rgba(0,0,0,0.2); backdrop-filter: blur(8px);
+      color: #fff; font-family: var(--sans); font-size: 0.72rem; font-weight: 500;
+      cursor: pointer; transition: background 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover { background: rgba(0,0,0,0.35); }
+    [data-theme="dark"] .theme-toggle {
+      border-color: var(--border); background: var(--surface);
+      color: var(--accent);
+    }
+    .theme-toggle svg { width: 14px; height: 14px; fill: currentColor; }
+
+    .hero-band {
+      background: var(--hero-grad);
+      clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+      padding: 4.5rem 2rem 7rem;
+      color: var(--hero-text);
+    }
+    .hero-inner { max-width: 1100px; margin: 0 auto; }
+    .hero-eyebrow { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.85; margin-bottom: 1.25rem; }
+    .hero-band h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 6vw, 4.25rem);
+      font-weight: 700; line-height: 1.08; letter-spacing: -0.02em;
+      max-width: 15ch; margin-bottom: 1.25rem;
+    }
+    .hero-band .lead { font-size: 1.05rem; max-width: 52ch; opacity: 0.92; line-height: 1.55; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    .chapters-wrap { margin: -2.5rem 0 2.5rem; position: sticky; top: 0; z-index: 50; }
+    .chapters {
+      display: flex; overflow-x: auto;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: 0 4px 24px var(--shadow);
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .chapters a {
+      flex: 1; min-width: 100px; padding: 0.9rem 0.5rem; text-align: center;
+      text-decoration: none; color: var(--muted); font-size: 0.72rem; font-weight: 500;
+      border-right: 1px solid var(--border); transition: color 0.2s, background 0.2s;
+    }
+    .chapters a:last-child { border-right: none; }
+    .chapters a:hover, .chapters a.active { color: var(--accent); background: var(--surface-hover); }
+
+    .logos { display: flex; flex-wrap: wrap; gap: 1.75rem; align-items: center; padding: 1.5rem 0 2.5rem; }
+    .logos img { height: 24px; opacity: 0.88; }
+
+    section { padding: 3.5rem 0; scroll-margin-top: 4rem; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .chapter-num { font-family: var(--serif); font-size: 2.75rem; font-weight: 700; color: var(--chapter-num); line-height: 1; margin-bottom: 0.35rem; }
+    h2 { font-family: var(--serif); font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.75rem; line-height: 1.15; }
+    h3 { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; margin: 2rem 0 0.6rem; }
+    p { color: var(--text); margin-bottom: 1rem; max-width: 68ch; }
+    p.prose { font-family: var(--serif); font-size: 1.05rem; line-height: 1.75; }
+
+    .split { display: grid; grid-template-columns: 1fr 260px; gap: 2.5rem; align-items: start; }
+    @media (max-width: 800px) { .split { grid-template-columns: 1fr; } }
+
+    aside.sidebar {
+      background: var(--surface); border: 1px solid var(--border); padding: 1.15rem;
+      position: sticky; top: 5rem; transition: background 0.25s;
+    }
+    aside.sidebar h4 {
+      font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 0.6rem;
+    }
+    aside.sidebar h4 + h4 { margin-top: 1.25rem; }
+    aside.sidebar ul { list-style: none; font-size: 0.82rem; }
+    aside.sidebar li { padding: 0.3rem 0; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+    aside.sidebar li:last-child { border-bottom: none; }
+
+    .metric-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1.5rem 0; }
+    .metric {
+      background: var(--surface); border: 1px solid var(--border); padding: 1rem 1.25rem;
+      flex: 1; min-width: 120px; transition: background 0.25s;
+    }
+    .metric .val { font-family: var(--serif); font-size: 1.75rem; font-weight: 700; color: var(--accent); line-height: 1; }
+    .metric .lbl { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+
+    .limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin: 1.5rem 0; }
+    .limits .item { background: var(--surface); border: 1px solid var(--border); padding: 1rem; transition: background 0.25s; }
+    .limits .item strong { display: block; font-size: 0.85rem; margin-bottom: 0.2rem; }
+    .limits .item span { font-size: 0.8rem; color: var(--muted); }
+
+    .pullquote {
+      font-family: var(--serif); font-size: 1.35rem; font-weight: 600; font-style: italic;
+      color: var(--quote); border-left: 3px solid var(--accent);
+      padding: 0.4rem 0 0.4rem 1.25rem; margin: 1.5rem 0; max-width: 52ch; line-height: 1.4;
+    }
+
+    .timeline { margin: 1.5rem 0; border-left: 2px solid var(--accent); padding-left: 1.75rem; }
+    .timeline-item { margin-bottom: 1.25rem; position: relative; }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -2.1rem; top: 0.35rem;
+      width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
+    }
+    .timeline-item strong { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.1rem; }
+    .timeline-item span { font-size: 0.82rem; color: var(--muted); }
+
+    /* Agentic loop */
+    .loop { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 1.5rem 0; }
+    .loop-node {
+      background: var(--surface); border: 1px solid var(--border); padding: 0.75rem 1rem;
+      text-align: center; min-width: 110px; transition: background 0.25s;
+    }
+    .loop-node strong { display: block; font-size: 0.85rem; }
+    .loop-node span { font-size: 0.72rem; color: var(--muted); }
+    .loop-arrow { color: var(--muted); font-size: 1.1rem; }
+
+    /* MCP stack */
+    .mcp-stack { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; margin: 1.5rem 0; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); transition: background 0.25s; }
+    .mcp-box { padding: 0.6rem 1.5rem; border: 1px solid var(--border); font-size: 0.82rem; text-align: center; min-width: 180px; }
+    .mcp-box.hl { border-color: var(--accent); background: var(--surface-accent); color: var(--accent); font-weight: 500; }
+    .mcp-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+    .mcp-arrow { color: var(--muted); font-size: 0.9rem; }
+
+    .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    @media (max-width: 700px) { .bento { grid-template-columns: 1fr; } }
+    .bento .cell { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem; transition: background 0.25s; }
+    .bento .cell.wide { grid-column: span 2; }
+    @media (max-width: 700px) { .bento .cell.wide { grid-column: span 1; } }
+    .bento .cell h4 { font-weight: 600; font-size: 0.88rem; margin-bottom: 0.3rem; }
+    .bento .cell p { font-size: 0.78rem; color: var(--muted); margin: 0; max-width: none; }
+
+    .code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    @media (max-width: 800px) { .code-grid { grid-template-columns: 1fr; } }
+
+    .code {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+      transition: background 0.25s;
+    }
+    .code .bar {
+      padding: 0.45rem 0.9rem; background: var(--code-bar); border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 0.68rem; color: var(--muted);
+      display: flex; justify-content: space-between;
+    }
+    .code pre {
+      padding: 0.9rem; overflow-x: auto; font-family: var(--mono);
+      font-size: 0.7rem; line-height: 1.55; color: var(--code-text);
+    }
+
+    .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    @media (max-width: 600px) { .modes { grid-template-columns: 1fr; } }
+    .modes .mode { background: var(--surface); border: 1px solid var(--border); padding: 1rem; transition: background 0.25s; }
+    .modes .mode .tag { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .modes .mode p { font-size: 0.82rem; margin: 0; max-width: none; }
+
+    .callout {
+      background: var(--surface); border-left: 3px solid var(--accent); padding: 0.85rem 1rem;
+      margin: 1.25rem 0; font-size: 0.88rem; color: var(--text); transition: background 0.25s;
+    }
+    .callout strong { color: var(--ink); }
+
+    .takeaways { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    @media (max-width: 600px) { .takeaways { grid-template-columns: 1fr; } }
+    .takeaways .card { background: var(--surface); border: 1px solid var(--border); padding: 1.1rem; transition: background 0.25s; }
+    .takeaways .card p { font-size: 0.85rem; margin: 0; max-width: none; }
+
+    .cta {
+      background: var(--cta-bg); color: var(--hero-text); padding: 3rem 2rem; margin-top: 3rem; text-align: center;
+      transition: background 0.25s;
+    }
+    .cta h2 { color: var(--hero-text); font-size: 1.75rem; margin-bottom: 0.6rem; }
+    .cta p { color: rgba(240, 253, 244, 0.72); margin: 0 auto; max-width: 50ch; font-size: 0.95rem; }
+
+    [data-theme="dark"] .logos img[src*="github"],
+    [data-theme="dark"] .logos img[src*="copilot"] {
+      filter: brightness(0) invert(1); opacity: 0.85;
+    }
+
+    footer {
+      padding: 2rem; text-align: center; font-size: 0.72rem; color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Adoption roadmap (chapter VII) */
+    .roadmap-intro { font-size: 0.95rem; color: var(--text); max-width: 60ch; margin-bottom: 1.5rem; }
+    .roadmap-toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.25rem; padding: 0.65rem 0.85rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; transition: background 0.25s;
+    }
+    .phase-pills { display: flex; flex-wrap: wrap; gap: 0.35rem; flex: 1; }
+    .phase-pill {
+      padding: 0.35rem 0.65rem; border-radius: 999px; font-size: 0.68rem; font-weight: 500;
+      text-decoration: none; color: var(--muted); border: 1px solid transparent;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+    }
+    .phase-pill:hover, .phase-pill.active { color: var(--accent); background: var(--surface-hover); border-color: var(--border); }
+    .btn-ghost {
+      padding: 0.4rem 0.75rem; border: 1px solid var(--border); border-radius: 6px;
+      background: transparent; color: var(--text-secondary); font-size: 0.72rem;
+      font-family: var(--sans); cursor: pointer; transition: background 0.2s;
+    }
+    .btn-ghost:hover { background: var(--surface-hover); color: var(--ink); }
+    .phase-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 0.75rem; overflow: hidden;
+      box-shadow: 0 1px 4px var(--shadow); transition: background 0.25s;
+    }
+    .phase-card[data-accent="1"] { --phase: #0d9668; --phase-soft: #e8f5ee; }
+    .phase-card[data-accent="2"] { --phase: #0f766e; --phase-soft: #e6f5f3; }
+    .phase-card[data-accent="3"] { --phase: #14bf96; --phase-soft: #ecfdf5; }
+    .phase-card[data-accent="4"] { --phase: #059669; --phase-soft: #ecfdf5; }
+    .phase-card[data-accent="5"] { --phase: #65a30d; --phase-soft: #f7fee7; }
+    .phase-card[data-accent="6"] { --phase: #0a5c4b; --phase-soft: #e8f5ee; }
+    [data-theme="dark"] .phase-card { --phase-soft: #1a2e24; }
+    .phase-header {
+      width: 100%; display: flex; align-items: center; gap: 1rem;
+      padding: 1.1rem 1.25rem; text-align: left; cursor: pointer;
+      background: transparent; border: none; font-family: var(--sans); color: inherit;
+    }
+    .phase-header:hover { background: var(--surface-hover); }
+    .phase-icon {
+      width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--phase), var(--accent-bright));
+      color: #fff; font-family: var(--serif); font-weight: 700; font-size: 1.1rem;
+    }
+    .phase-meta { flex: 1; min-width: 0; }
+    .phase-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--phase); }
+    .phase-duration { font-size: 0.72rem; color: var(--muted); margin-left: 0.5rem; }
+    .phase-title { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; margin-top: 0.2rem; color: var(--ink); }
+    .phase-tagline { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.15rem; }
+    .chevron { width: 20px; height: 20px; flex-shrink: 0; color: var(--muted); transition: transform 0.25s; }
+    .phase-card.open .chevron { transform: rotate(180deg); }
+    .phase-body { display: none; border-top: 1px solid var(--border); padding: 1.25rem; }
+    .phase-card.open .phase-body { display: block; }
+    .objective {
+      background: var(--phase-soft); border: 1px solid var(--border);
+      border-left: 3px solid var(--phase); padding: 1rem 1.15rem;
+      margin-bottom: 1.25rem; border-radius: 0 6px 6px 0;
+    }
+    .objective p { font-family: var(--serif); font-size: 0.95rem; line-height: 1.65; color: var(--text); margin: 0; max-width: none; }
+    .section-label {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--phase); margin-bottom: 0.5rem;
+    }
+    .section-block { margin-bottom: 1.25rem; }
+    ul.checklist { list-style: none; }
+    ul.checklist li {
+      display: flex; gap: 0.6rem; align-items: flex-start;
+      padding: 0.4rem 0; font-size: 0.85rem; color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    ul.checklist li:last-child { border-bottom: none; }
+    ul.checklist li::before { content: '✓'; color: var(--phase); font-weight: 700; font-size: 0.75rem; margin-top: 0.15rem; }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tag {
+      font-family: var(--mono); font-size: 0.68rem; padding: 0.35rem 0.6rem;
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text);
+    }
+    .exit-box {
+      background: var(--surface-muted); border: 1px solid var(--border);
+      padding: 0.9rem 1rem; border-radius: 6px;
+      font-size: 0.85rem; color: var(--text); line-height: 1.6;
+    }
+    ul.checklist.risks li::before { content: '⚠'; color: var(--warn); }
+    ul.checklist.risks li { border-bottom-color: var(--warn-border); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">
+  <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-16h2v3h-2V1zm0 19h2v3h-2v-3zM4.2 4.2l2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zm15.5 15.5 2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zM1 11h3v2H1v-2zm19 0h3v2h-3v-2zM4.2 19.8l2.1-2.1 2.1 2.1-2.1 2.1-2.1-2.1zm15.5-15.5 2.1-2.1 2.1 2.1-2.1 2.1-2.1-2.1z"/></svg>
+  <span id="themeLabel">Dark</span>
+</button>
+
+<div class="hero-band">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">IT Cloud Team · Enablement Session</p>
+    <h1>From LLMs to Agentic AI</h1>
+    <p class="lead">A hands-on guide for the IT Cloud Team — how language models became autonomous agents, and how to build a custom GitHub Copilot plugin that ships infrastructure to Azure with OpenTofu.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="chapters-wrap">
+    <nav class="chapters" id="nav">
+      <a href="#ch1">Evolution</a>
+      <a href="#ch2">MCP</a>
+      <a href="#ch3">Workbench</a>
+      <a href="#ch4">Agent Mode</a>
+      <a href="#ch5">Plugin</a>
+      <a href="#ch6">Takeaways</a>
+      <a href="#ch7">Adoption</a>
+    </nav>
+  </div>
+
+  <div class="logos">
+    <img src="assets/logos/github.svg" alt="GitHub">
+    <img src="assets/logos/copilot.svg" alt="GitHub Copilot">
+    <img src="assets/logos/azure.svg" alt="Microsoft Azure">
+    <img src="assets/logos/vscode.svg" alt="Visual Studio Code">
+    <img src="assets/logos/opentofu.svg" alt="OpenTofu">
+    <img src="assets/logos/terraform.svg" alt="Terraform">
+  </div>
+
+  <!-- CHAPTER I: EVOLUTION -->
+  <section id="ch1">
+    <div class="split">
+      <div>
+        <div class="chapter-num">I</div>
+        <h2>The evolution of intelligence</h2>
+
+        <h3>What an LLM actually is</h3>
+        <p class="prose">An LLM is a very large neural network trained to predict the next token. Everything it "knows" is compressed into weights learned from text. It is a brilliant pattern engine — not a database, not a reasoner with a will.</p>
+
+        <div class="limits">
+          <div class="item"><strong>Knowledge cutoff</strong><span>Frozen at training time</span></div>
+          <div class="item"><strong>No memory</strong><span>Between calls</span></div>
+          <div class="item"><strong>No system access</strong><span>Cannot touch your infra</span></div>
+          <div class="item"><strong>Hallucination</strong><span>Confident but wrong</span></div>
+        </div>
+
+        <p class="pullquote">A raw model is a powerful brain in a jar. Tools, context, and a loop turn it into an agent.</p>
+
+        <h3>The five-step climb</h3>
+        <div class="timeline">
+          <div class="timeline-item"><strong>LLM</strong><span>Predicts text from patterns in weights</span></div>
+          <div class="timeline-item"><strong>+ RAG</strong><span>Retrieves your docs at query time — grounded, current, private knowledge</span></div>
+          <div class="timeline-item"><strong>+ Tools</strong><span>Calls functions — read a file, run a query, hit an API</span></div>
+          <div class="timeline-item"><strong>+ MCP</strong><span>Standardizes how tools plug in — any client talks to any server</span></div>
+          <div class="timeline-item"><strong>Agent</strong><span>Closes the loop: plan, act, observe, adapt until the goal is met</span></div>
+        </div>
+
+        <h3>What makes a system agentic?</h3>
+        <div class="loop">
+          <div class="loop-node"><strong>Perceive</strong><span>Read context &amp; goal</span></div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-node"><strong>Plan</strong><span>Break into steps</span></div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-node"><strong>Act</strong><span>Call tools / MCP</span></div>
+          <span class="loop-arrow">→</span>
+          <div class="loop-node"><strong>Reflect</strong><span>Evaluate result</span></div>
+        </div>
+
+        <h3>Copilot: from autocomplete to coworker</h3>
+        <div class="modes">
+          <div class="mode">
+            <div class="tag">Completions</div>
+            <p>Suggests the next line as you type. You stay fully in control of every keystroke.</p>
+          </div>
+          <div class="mode">
+            <div class="tag">Chat / Edit</div>
+            <p>Ask questions, refactor across files. The model proposes; you review and apply.</p>
+          </div>
+          <div class="mode">
+            <div class="tag">Agent Mode</div>
+            <p>Give a goal. It plans, edits files, runs terminal commands, calls MCP tools, and iterates until done.</p>
+          </div>
+        </div>
+        <div class="callout"><strong>Our target:</strong> Agent Mode driving Azure + OpenTofu through MCP, governed by skills, hooks, and instructions we author ourselves.</div>
+      </div>
+      <aside class="sidebar">
+        <h4>Agentic traits</h4>
+        <ul>
+          <li>Autonomy across many steps</li>
+          <li>Tool use with real results</li>
+          <li>Adaptation from feedback</li>
+        </ul>
+        <h4>Session topics</h4>
+        <ul>
+          <li>LLM foundations</li>
+          <li>Model Context Protocol</li>
+          <li>VSCode · Azure · OpenTofu</li>
+          <li>Custom Copilot plugin</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CHAPTER II: MCP -->
+  <section id="ch2">
+    <div class="chapter-num">II</div>
+    <h2>Model Context Protocol</h2>
+    <p class="prose">MCP is the USB-C for AI — an open standard (now under the Linux Foundation) that defines a single, common way for AI clients to connect to tools and data sources. Build a connector once — every MCP-aware host can use it.</p>
+
+    <div class="metric-row">
+      <div class="metric"><div class="val">N×M</div><div class="lbl">Bespoke integrations before MCP</div></div>
+      <div class="metric"><div class="val">N+M</div><div class="lbl">Connectors with one protocol</div></div>
+      <div class="metric"><div class="val">JSON-RPC</div><div class="lbl">stdio or HTTP/SSE transport</div></div>
+    </div>
+
+    <h3>Architecture &amp; primitives</h3>
+    <div class="split">
+      <div>
+        <div class="bento">
+          <div class="cell"><h4>Host</h4><p>The app (VSCode + Copilot) the user works in</p></div>
+          <div class="cell"><h4>Client</h4><p>Lives in the host, one per server connection</p></div>
+          <div class="cell"><h4>Server</h4><p>Exposes capabilities to the model</p></div>
+          <div class="cell wide"><h4>Tools</h4><p>Actions the model can invoke</p></div>
+          <div class="cell"><h4>Resources</h4><p>Data and files it can read</p></div>
+          <div class="cell"><h4>Prompts</h4><p>Reusable templated workflows</p></div>
+        </div>
+      </div>
+      <div class="mcp-stack">
+        <div class="mcp-box hl">VSCode + Copilot <span style="font-weight:400;color:var(--muted)">— Host</span></div>
+        <div class="mcp-arrow">↓</div>
+        <div class="mcp-row">
+          <div class="mcp-box">Client A</div>
+          <div class="mcp-box">Client B</div>
+          <div class="mcp-box">Client C</div>
+        </div>
+        <div class="mcp-arrow">↓ JSON-RPC 2.0</div>
+        <div class="mcp-row">
+          <div class="mcp-box hl">GitHub</div>
+          <div class="mcp-box hl">Azure</div>
+          <div class="mcp-box hl">Terraform</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTER III: WORKBENCH -->
+  <section id="ch3">
+    <div class="chapter-num">III</div>
+    <h2>The cloud engineer workbench</h2>
+    <p class="prose">A workspace where Copilot Agent Mode can read state, plan changes, and apply them safely — all in version control.</p>
+
+    <div class="bento">
+      <div class="cell wide">
+        <h4>VSCode extensions</h4>
+        <p>GitHub Copilot + Copilot Chat (Agent Mode) · HashiCorp Terraform (OpenTofu / HCL) · Azure Tools / Azure CLI + Bicep · Dev Containers</p>
+      </div>
+      <div class="cell wide">
+        <h4>Cloud + IaC stack</h4>
+        <p>OpenTofu CLI · Azure CLI authenticated to your tenant · azurerm provider + remote state in Blob Storage · Service principal / managed identity for CI</p>
+      </div>
+    </div>
+
+    <h3>OpenTofu + Azure baseline</h3>
+    <div class="code-grid">
+      <div class="code">
+        <div class="bar"><span>main.tf</span><span>HCL</span></div>
+        <pre>terraform {
+  required_version = ">= 1.7.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+  }
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstateteam"
+    container_name       = "tfstate"
+    key                  = "platform.tfstate"
+  }
+}
+
+provider "azurerm" {
+  features {}
+}</pre>
+      </div>
+      <div class="code">
+        <div class="bar"><span>rg.tf</span><span>HCL</span></div>
+        <pre>resource "azurerm_resource_group" "lz" {
+  name     = "rg-landing-zone-dev"
+  location = "westeurope"
+  tags = {
+    owner       = "cloud-team"
+    managed_by  = "opentofu"
+    environment = "dev"
+  }
+}</pre>
+      </div>
+    </div>
+    <p style="font-size:0.82rem;color:var(--muted);">Workflow: <code style="font-family:var(--mono);">tofu init → tofu plan → tofu apply</code>. Remote state means the agent and the team share one source of truth.</p>
+
+    <h3>Wiring MCP servers into VSCode</h3>
+    <div class="code">
+      <div class="bar"><span>.vscode/mcp.json</span><span>JSON</span></div>
+      <pre>{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${input:gh_pat}"
+      }
+    },
+    "azure": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@azure/mcp@latest", "server", "start"]
+    },
+    "terraform": {
+      "type": "stdio",
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
+    }
+  },
+  "inputs": [
+    { "id": "gh_pat", "type": "promptString",
+      "description": "GitHub PAT", "password": true }
+  ]
+}</pre>
+    </div>
+    <div class="bento">
+      <div class="cell"><h4>GitHub MCP</h4><p>Issues, PRs, repo search, Actions</p></div>
+      <div class="cell"><h4>Azure MCP</h4><p>Subscriptions, resources, AKS, KQL</p></div>
+      <div class="cell"><h4>Terraform MCP</h4><p>Registry, modules, provider docs</p></div>
+    </div>
+    <div class="callout"><strong>Secrets:</strong> Go through <code style="font-family:var(--mono);font-size:0.8rem;">inputs</code>, never hardcoded. VSCode prompts once and stores them securely.</div>
+  </section>
+
+  <!-- CHAPTER IV: AGENT MODE -->
+  <section id="ch4">
+    <div class="chapter-num">IV</div>
+    <h2>A request, end to end</h2>
+    <p class="pullquote" style="font-style:normal;font-family:var(--mono);font-size:0.95rem;color:var(--accent);border-color:var(--accent);">"Stand up a dev AKS landing zone and open a PR."</p>
+
+    <div class="timeline">
+      <div class="timeline-item"><strong>1 · Instructions</strong><span>Inject your standards — naming, tagging, region policy</span></div>
+      <div class="timeline-item"><strong>2 · Planner agent</strong><span>Queries Azure MCP for existing resources + Terraform MCP for module docs</span></div>
+      <div class="timeline-item"><strong>3 · Implementer agent</strong><span>Scaffolds .tf files via the OpenTofu skill</span></div>
+      <div class="timeline-item"><strong>4 · PreToolUse hook</strong><span>Runs tofu validate + policy check before any apply</span></div>
+      <div class="timeline-item"><strong>5 · GitHub MCP</strong><span>Opens a pull request with the plan output attached</span></div>
+    </div>
+  </section>
+
+  <!-- CHAPTER V: PLUGIN -->
+  <section id="ch5">
+    <div class="chapter-num">V</div>
+    <h2>Building the Azure IaC Copilot plugin</h2>
+    <p class="prose">Six customization layers bundle into one shippable unit — instructions, prompts, skills, agents, MCP servers, and hooks.</p>
+
+    <div class="bento">
+      <div class="cell"><h4>Instructions</h4><p>Always-on rules &amp; context applied to every task</p></div>
+      <div class="cell"><h4>Prompt files</h4><p>Reusable, manually-invoked workflows (/deploy, /review)</p></div>
+      <div class="cell"><h4>Skills</h4><p>Auto-discovered procedures when relevant</p></div>
+      <div class="cell"><h4>Custom agents</h4><p>Named personas with own model, tools, scope</p></div>
+      <div class="cell"><h4>MCP servers</h4><p>Live connections to external tools and data</p></div>
+      <div class="cell"><h4>Hooks</h4><p>Deterministic scripts on lifecycle events — guardrails</p></div>
+    </div>
+
+    <h3>Plugin anatomy</h3>
+    <div class="code-grid">
+      <div class="code">
+        <div class="bar"><span>azure-iac-plugin/</span><span>tree</span></div>
+        <pre>azure-iac-plugin/
+├─ plugin.json            # manifest
+├─ .mcp.json              # bundled MCP servers
+├─ instructions/
+│  └─ terraform.md        # IaC standards
+├─ agents/
+│  ├─ iac-planner.md
+│  └─ iac-implementer.md
+├─ skills/
+│  └─ opentofu-review/
+│     └─ SKILL.md
+├─ prompts/
+│  └─ deploy-landing-zone.md
+└─ hooks/
+   └─ hooks.json + guard.sh</pre>
+      </div>
+      <div class="code">
+        <div class="bar"><span>plugin.json</span><span>JSON</span></div>
+        <pre>{
+  "name": "azure-iac-plugin",
+  "displayName": "Azure IaC Copilot",
+  "version": "1.0.0",
+  "description": "Plan & ship Azure infra with OpenTofu",
+  "publisher": "cloud-team",
+  "contributes": {
+    "agents":       ["./agents"],
+    "skills":       ["./skills"],
+    "instructions": ["./instructions"],
+    "prompts":      ["./prompts"],
+    "mcpServers":   "./.mcp.json",
+    "hooks":        "./hooks/hooks.json"
+  }
+}</pre>
+      </div>
+    </div>
+
+    <h3>Layer 1 — Instructions</h3>
+    <div class="code">
+      <div class="bar"><span>instructions/terraform.md</span><span>Markdown</span></div>
+      <pre>---
+applyTo: "**/*.tf"
+---
+# OpenTofu / Azure standards
+
+- Pin every provider with a ~> constraint.
+- Never hardcode secrets — read from
+  Azure Key Vault data sources.
+- All resources carry owner, environment,
+  and managed_by tags.
+- Default region is westeurope unless the
+  user states otherwise.
+- Use remote azurerm backend; never local state.
+- Resource names follow:
+  &lt;type&gt;-&lt;workload&gt;-&lt;env&gt; (rg-payments-dev).</pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);">Instructions apply automatically via <code style="font-family:var(--mono);">applyTo</code> globs. Keep them short and rule-like — crisp, testable constraints.</p>
+
+    <h3>Layer 2 — Skills</h3>
+    <div class="code">
+      <div class="bar"><span>skills/opentofu-review/SKILL.md</span><span>Markdown</span></div>
+      <pre>---
+name: opentofu-review
+description: Validate & review an OpenTofu
+  module before plan/apply. Use whenever
+  .tf files change.
+---
+# OpenTofu module review
+
+When invoked:
+1. Run `tofu fmt -check` and fix drift.
+2. Run `tofu validate`.
+3. Confirm all providers are version-pinned.
+4. Flag any resource missing required tags.
+5. Confirm no plaintext secrets exist.
+6. Summarise findings as a checklist.</pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);">Skills are <strong>auto-discovered</strong> by the agent (reads description first, loads full skill when matched). Prompt files are <strong>manually invoked</strong> with a slash command.</p>
+
+    <h3>Layer 3 — Custom agents</h3>
+    <div class="code">
+      <div class="bar"><span>agents/iac-planner.md</span><span>Markdown</span></div>
+      <pre>---
+name: iac-planner
+description: Designs Azure architecture and
+  produces an OpenTofu plan. Read-only.
+tools:
+  - codebase
+  - azure-mcp
+  - terraform-mcp
+handoffs:
+  - iac-implementer
+---
+You are a senior cloud architect. Inspect
+the current Azure estate and the repo, then
+propose a minimal, well-tagged OpenTofu
+change set. Do NOT write files — hand off to
+iac-implementer once the user approves.</pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);">Least privilege: planner is read-only. Only <code style="font-family:var(--mono);">iac-implementer</code> can edit files and run <code style="font-family:var(--mono);">apply</code>. Agents hand off to form a team: architect → builder → reviewer.</p>
+
+    <h3>Layer 4 — Hooks</h3>
+    <div class="code">
+      <div class="bar"><span>hooks/hooks.json</span><span>JSON</span></div>
+      <pre>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_in_terminal",
+        "command": "./hooks/guard.sh",
+        "description": "Block tofu apply without an approved plan"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "edit_file",
+        "command": "tofu fmt -recursive",
+        "description": "Auto-format HCL after edits"
+      }
+    ]
+  }
+}</pre>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);">Hooks are deterministic — they <strong>always</strong> run on lifecycle events. A non-zero exit blocks destructive actions.</p>
+
+    <h3>Security &amp; governance</h3>
+    <div class="bento">
+      <div class="cell"><h4>Trust MCP sources</h4><p>Only add servers you trust. Review third-party tools like any dependency.</p></div>
+      <div class="cell"><h4>Org policy</h4><p>Centrally allow/deny MCP servers. Require approval for new tools.</p></div>
+      <div class="cell"><h4>Secrets via Key Vault</h4><p>No credentials in code. Input prompts, Key Vault, managed identities.</p></div>
+      <div class="cell wide"><h4>Human in the loop</h4><p>Require approval for terminal commands and destructive ops. Hooks enforce it deterministically.</p></div>
+    </div>
+  </section>
+
+  <!-- CHAPTER VI: ROADMAP -->
+  <section id="ch6">
+    <div class="chapter-num">VI</div>
+    <h2>Key takeaways</h2>
+    <div class="takeaways">
+      <div class="card"><p>An LLM is a pattern engine. Tools, context, and a loop turn it into an <strong>agent</strong>.</p></div>
+      <div class="card"><p><strong>MCP</strong> is the universal connector — build once, use everywhere.</p></div>
+      <div class="card"><p>VSCode + OpenTofu + Azure MCP gives the agent a real, governed sandbox.</p></div>
+      <div class="card"><p>A <strong>plugin</strong> bundles instructions, skills, agents, MCP, and hooks into one shippable unit.</p></div>
+    </div>
+  </section>
+
+  <section id="ch7">
+    <div class="chapter-num">VII</div>
+    <h2>Adoption roadmap</h2>
+    <p class="roadmap-intro">Six sequential phases from a standardized workspace to a shipped, governed Copilot plugin. Estimated end-to-end timeline: <strong>13–17 weeks</strong> with a small platform team.</p>
+
+    <div class="roadmap-toolbar">
+      <nav class="phase-pills" id="phaseNav" aria-label="Jump to phase">
+        <a class="phase-pill active" href="#phase-1">P1</a>
+        <a class="phase-pill" href="#phase-2">P2</a>
+        <a class="phase-pill" href="#phase-3">P3</a>
+        <a class="phase-pill" href="#phase-4">P4</a>
+        <a class="phase-pill" href="#phase-5">P5</a>
+        <a class="phase-pill" href="#phase-6">P6</a>
+      </nav>
+      <button class="btn-ghost" id="expandAll" type="button">Expand all</button>
+    </div>
+
+    <article class="phase-card open" id="phase-1" data-accent="1">
+      <button class="phase-header" type="button" aria-expanded="true">
+        <div class="phase-icon">1</div>
+        <div class="phase-meta">
+          <div><span class="phase-label">Phase 1</span><span class="phase-duration">~2 weeks</span></div>
+          <div class="phase-title">Standardize the Workspace</div>
+          <div class="phase-tagline">A reproducible toolchain every engineer can spin up in under an hour.</div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="phase-body">
+        <div class="objective"><p><strong>Objective:</strong> Eliminate "works on my machine" by codifying the entire local dev environment — editor, extensions, CLIs, and a dev container — so onboarding is a single command.</p></div>
+        <div class="section-block">
+          <div class="section-label">Task checklist</div>
+          <ul class="checklist">
+            <li>Pin the VSCode extension set: GitHub Copilot, Copilot Chat (Agent Mode), HashiCorp Terraform, Azure Tools, Bicep.</li>
+            <li>Install and version-pin OpenTofu and Azure CLI; document supported versions.</li>
+            <li>Author a devcontainer.json bundling OpenTofu, Azure CLI, tofu/terraform LSP, and shell tooling.</li>
+            <li>Add .vscode/extensions.json with recommended extensions so the editor prompts on clone.</li>
+            <li>Write a CONTRIBUTING / SETUP.md with the one-command bootstrap flow.</li>
+            <li>Validate the container builds clean on a fresh machine (mac + Windows/WSL).</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="section-block">
+            <div class="section-label">Deliverables</div>
+            <div class="tags"><span class="tag">devcontainer.json + Dockerfile</span><span class="tag">.vscode/extensions.json</span><span class="tag">SETUP.md</span></div>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Suggested owners</div>
+            <p style="font-size:0.85rem;color:var(--text);margin:0;">Platform lead + 1 engineer</p>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Exit criteria</div>
+          <div class="exit-box">A new engineer goes from git clone to a working OpenTofu + Azure environment in under 60 minutes, with zero manual tool installs.</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Key risks &amp; mitigations</div>
+          <ul class="checklist risks">
+            <li>Tool version drift across OS — pin everything and test on each platform.</li>
+            <li>Corporate proxy/firewall blocking container image pulls — pre-mirror images internally.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="phase-card" id="phase-2" data-accent="2">
+      <button class="phase-header" type="button" aria-expanded="false">
+        <div class="phase-icon">2</div>
+        <div class="phase-meta">
+          <div><span class="phase-label">Phase 2</span><span class="phase-duration">~2 weeks</span></div>
+          <div class="phase-title">Add MCP Servers</div>
+          <div class="phase-tagline">Give the agent eyes and hands: GitHub, Azure, and Terraform over MCP.</div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="phase-body">
+        <div class="objective"><p><strong>Objective:</strong> Connect Copilot Agent Mode to live tooling through trusted MCP servers, with secrets handled securely, and prove the agent can read real state and act.</p></div>
+        <div class="section-block">
+          <div class="section-label">Task checklist</div>
+          <ul class="checklist">
+            <li>Create .vscode/mcp.json defining the GitHub, Azure, and Terraform MCP servers.</li>
+            <li>Route all credentials through input prompts / Key Vault — nothing hardcoded.</li>
+            <li>Have security review each server before enabling (treat like a dependency).</li>
+            <li>Smoke-test each server in isolation: query a subscription, search a repo, fetch a module doc.</li>
+            <li>Run a guided Agent Mode session: "summarise our dev resource group" to confirm tool calls work.</li>
+            <li>Document the allow-list and how engineers request a new server.</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="section-block">
+            <div class="section-label">Deliverables</div>
+            <div class="tags"><span class="tag">.vscode/mcp.json</span><span class="tag">Secrets runbook</span><span class="tag">MCP allow-list</span></div>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Suggested owners</div>
+            <p style="font-size:0.85rem;color:var(--text);margin:0;">Platform lead + security reviewer</p>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Exit criteria</div>
+          <div class="exit-box">In Agent Mode an engineer can ask a natural-language question that triggers a real Azure query and a GitHub action (e.g. open a draft PR), end to end.</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Key risks &amp; mitigations</div>
+          <ul class="checklist risks">
+            <li>Over-permissioned service principals — start read-only, widen deliberately.</li>
+            <li>Untrusted third-party servers — only enable reviewed, allow-listed sources.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="phase-card" id="phase-3" data-accent="3">
+      <button class="phase-header" type="button" aria-expanded="false">
+        <div class="phase-icon">3</div>
+        <div class="phase-meta">
+          <div><span class="phase-label">Phase 3</span><span class="phase-duration">~2 weeks</span></div>
+          <div class="phase-title">Author Instructions</div>
+          <div class="phase-tagline">Encode your IaC, naming, and tagging standards as always-on rules.</div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="phase-body">
+        <div class="objective"><p><strong>Objective:</strong> Capture the team's conventions as scoped instruction files so generated code follows your standards automatically, without anyone re-typing them.</p></div>
+        <div class="section-block">
+          <div class="section-label">Task checklist</div>
+          <ul class="checklist">
+            <li>Document current naming convention (&lt;type&gt;-&lt;workload&gt;-&lt;env&gt;) and required tags.</li>
+            <li>Define region policy, provider-pinning rules, and the no-plaintext-secrets rule.</li>
+            <li>Write instructions/terraform.md with an applyTo glob scoped to **/*.tf.</li>
+            <li>Keep rules crisp and testable — short constraints, not essays.</li>
+            <li>A/B test: generate the same module with and without instructions; compare drift.</li>
+            <li>Iterate until generated HCL passes review with minimal manual correction.</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="section-block">
+            <div class="section-label">Deliverables</div>
+            <div class="tags"><span class="tag">instructions/terraform.md</span><span class="tag">Naming + tagging standard</span><span class="tag">Before/after evidence</span></div>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Suggested owners</div>
+            <p style="font-size:0.85rem;color:var(--text);margin:0;">Senior cloud engineers (standards owners)</p>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Exit criteria</div>
+          <div class="exit-box">Code the agent generates conforms to naming, tagging, region, and provider-pinning standards on the first pass, with reviewers making only minor edits.</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Key risks &amp; mitigations</div>
+          <ul class="checklist risks">
+            <li>Instruction bloat diluting model attention — keep them short and rule-like.</li>
+            <li>Conflicting or stale rules — assign a single standards owner.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="phase-card" id="phase-4" data-accent="4">
+      <button class="phase-header" type="button" aria-expanded="false">
+        <div class="phase-icon">4</div>
+        <div class="phase-meta">
+          <div><span class="phase-label">Phase 4</span><span class="phase-duration">~3–4 weeks</span></div>
+          <div class="phase-title">Build Skills + Agent Team</div>
+          <div class="phase-tagline">Reusable procedures plus a planner → implementer → reviewer team.</div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="phase-body">
+        <div class="objective"><p><strong>Objective:</strong> Move from ad-hoc prompting to repeatable workflows: auto-discovered skills for common procedures and a small team of scoped agents that delegate to each other.</p></div>
+        <div class="section-block">
+          <div class="section-label">Task checklist</div>
+          <ul class="checklist">
+            <li>Author skills/opentofu-review/SKILL.md with a clear description for auto-discovery.</li>
+            <li>Build a read-only iac-planner agent (codebase + azure-mcp + terraform-mcp).</li>
+            <li>Build an iac-implementer agent that can edit files and run plan/apply.</li>
+            <li>Define handoffs so the planner delegates to the implementer after approval.</li>
+            <li>Apply least privilege: only the implementer gets write/apply tools.</li>
+            <li>End-to-end rehearsal: drive a small landing-zone change through the full team.</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="section-block">
+            <div class="section-label">Deliverables</div>
+            <div class="tags"><span class="tag">skills/opentofu-review</span><span class="tag">agents/iac-planner.md</span><span class="tag">agents/iac-implementer.md</span></div>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Suggested owners</div>
+            <p style="font-size:0.85rem;color:var(--text);margin:0;">Platform team (2–3 engineers)</p>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Exit criteria</div>
+          <div class="exit-box">The agent team completes a realistic task — plan a dev landing zone, scaffold the .tf files, and self-review — with a human approving the transition between plan and apply.</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Key risks &amp; mitigations</div>
+          <ul class="checklist risks">
+            <li>Agents exceeding scope — enforce least-privilege tool lists per agent.</li>
+            <li>Skill descriptions too vague to be discovered — write task-matching summaries.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="phase-card" id="phase-5" data-accent="5">
+      <button class="phase-header" type="button" aria-expanded="false">
+        <div class="phase-icon">5</div>
+        <div class="phase-meta">
+          <div><span class="phase-label">Phase 5</span><span class="phase-duration">~2 weeks</span></div>
+          <div class="phase-title">Add Hooks (Guardrails)</div>
+          <div class="phase-tagline">Deterministic scripts that always run — formatting, validation, hard stops.</div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="phase-body">
+        <div class="objective"><p><strong>Objective:</strong> Layer in non-probabilistic guardrails on lifecycle events so destructive actions are blocked and quality checks run every time — regardless of what the model decides.</p></div>
+        <div class="section-block">
+          <div class="section-label">Task checklist</div>
+          <ul class="checklist">
+            <li>Define hooks/hooks.json with PreToolUse and PostToolUse handlers.</li>
+            <li>Write guard.sh to block tofu apply without an approved, reviewed plan.</li>
+            <li>Add a PostToolUse hook to run tofu fmt -recursive after edits.</li>
+            <li>Test the hard-stop path: confirm a non-zero exit cancels a destructive op.</li>
+            <li>Wire validation (tofu validate + policy check) into the pre-apply gate.</li>
+            <li>Document hook behaviour so engineers understand why an action was blocked.</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="section-block">
+            <div class="section-label">Deliverables</div>
+            <div class="tags"><span class="tag">hooks/hooks.json</span><span class="tag">hooks/guard.sh</span><span class="tag">Guardrail docs</span></div>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Suggested owners</div>
+            <p style="font-size:0.85rem;color:var(--text);margin:0;">Platform + security</p>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Exit criteria</div>
+          <div class="exit-box">A tofu apply against prod without a reviewed plan is reliably blocked by the hook, and HCL is auto-formatted after every agent edit — with no reliance on the model remembering.</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Key risks &amp; mitigations</div>
+          <ul class="checklist risks">
+            <li>Over-aggressive hooks blocking legitimate work — log clearly and allow override paths.</li>
+            <li>Hooks not running on all machines — ship them inside the plugin (Phase 6).</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <article class="phase-card" id="phase-6" data-accent="6">
+      <button class="phase-header" type="button" aria-expanded="false">
+        <div class="phase-icon">6</div>
+        <div class="phase-meta">
+          <div><span class="phase-label">Phase 6</span><span class="phase-duration">~2–3 weeks</span></div>
+          <div class="phase-title">Package &amp; Publish</div>
+          <div class="phase-tagline">Bundle everything into one shippable plugin for the whole team.</div>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="phase-body">
+        <div class="objective"><p><strong>Objective:</strong> Consolidate instructions, skills, agents, MCP servers, and hooks into a single versioned plugin, publish it internally, and drive team-wide adoption.</p></div>
+        <div class="section-block">
+          <div class="section-label">Task checklist</div>
+          <ul class="checklist">
+            <li>Create plugin.json manifest wiring up all six customization layers.</li>
+            <li>Bundle .mcp.json so servers and hooks travel with the plugin.</li>
+            <li>Version with semver and write a CHANGELOG.</li>
+            <li>Publish to your internal registry / shared repo with install instructions.</li>
+            <li>Run an enablement session and capture a feedback channel.</li>
+            <li>Define an ownership + update cadence (who maintains, how fixes ship).</li>
+          </ul>
+        </div>
+        <div class="grid-2">
+          <div class="section-block">
+            <div class="section-label">Deliverables</div>
+            <div class="tags"><span class="tag">Packaged plugin</span><span class="tag">Install docs</span><span class="tag">Maintenance plan</span></div>
+          </div>
+          <div class="section-block">
+            <div class="section-label">Suggested owners</div>
+            <p style="font-size:0.85rem;color:var(--text);margin:0;">Platform lead + enablement</p>
+          </div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Exit criteria</div>
+          <div class="exit-box">The whole IT Cloud Team installs one plugin and inherits the full governed setup — standards, agents, and guardrails — with a clear owner and update process in place.</div>
+        </div>
+        <div class="section-block">
+          <div class="section-label">Key risks &amp; mitigations</div>
+          <ul class="checklist risks">
+            <li>Manifest keys / MCP names drifting with vendor updates — verify against current docs before each release.</li>
+            <li>Adoption stalling — pair the launch with hands-on enablement, not just a link.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:1.5rem;">Timelines assume a 2–3 person platform team running phases roughly sequentially with some overlap. Verify exact plugin manifest keys, MCP server package names, and hook event names against current GitHub Copilot &amp; MCP documentation before each release.</p>
+  </section>
+</div>
+
+<div class="cta">
+  <h2>Let's build the Azure IaC Copilot plugin together.</h2>
+  <p>An LLM is a pattern engine. MCP is the universal connector. A plugin bundles it all into one shippable unit.</p>
+</div>
+
+<footer>
+  Tooling evolves fast — verify exact manifest keys and MCP server names against current docs before rollout.
+</footer>
+
+<script>
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeLabel = document.getElementById('themeLabel');
+
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    themeLabel.textContent = theme === 'dark' ? 'Light' : 'Dark';
+    localStorage.setItem('cloud-training-theme', theme);
+  }
+
+  const saved = localStorage.getItem('cloud-training-theme');
+  if (saved === 'dark' || saved === 'light') {
+    applyTheme(saved);
+  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    applyTheme('dark');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('#nav a');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  const phaseCards = document.querySelectorAll('.phase-card');
+  const expandBtn = document.getElementById('expandAll');
+  let allExpanded = false;
+
+  phaseCards.forEach(card => {
+    const header = card.querySelector('.phase-header');
+    header.addEventListener('click', () => {
+      const open = card.classList.toggle('open');
+      header.setAttribute('aria-expanded', open);
+      allExpanded = [...phaseCards].every(c => c.classList.contains('open'));
+      if (expandBtn) expandBtn.textContent = allExpanded ? 'Collapse all' : 'Expand all';
+    });
+  });
+
+  if (expandBtn) {
+    expandBtn.addEventListener('click', () => {
+      allExpanded = !allExpanded;
+      phaseCards.forEach(card => {
+        card.classList.toggle('open', allExpanded);
+        card.querySelector('.phase-header').setAttribute('aria-expanded', allExpanded);
+      });
+      expandBtn.textContent = allExpanded ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  const phasePills = document.querySelectorAll('.phase-pill');
+  if (phasePills.length) {
+    const phaseObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          phasePills.forEach(p => p.classList.toggle('active', p.getAttribute('href') === '#' + e.target.id));
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    phaseCards.forEach(c => phaseObserver.observe(c));
+  }
+</script>
+</body>
+</html>
