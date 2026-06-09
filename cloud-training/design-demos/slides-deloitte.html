@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>From LLMs to Agentic AI — Deloitte Slides</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      --green: #86BC25;
+      --green-dark: #6B9619;
+      --green-soft: #EEF6E0;
+      --black: #0F0B0B;
+      --bg: #FFFFFF;
+      --surface: #FFFFFF;
+      --surface-2: #F7F7F7;
+      --ink: #0F0B0B;
+      --text: #3D3D3D;
+      --muted: #757575;
+      --border: #E0E0E0;
+      --code-bg: #F7F7F7;
+      --code-text: #2A2A2A;
+      --header-bg: #FFFFFF;
+      --logo-color: #0F0B0B;
+      --slide-bg: #FFFFFF;
+    }
+    [data-theme="dark"] {
+      --bg: #0F0B0B;
+      --surface: #1A1818;
+      --surface-2: #141414;
+      --ink: #F5F5F5;
+      --text: #C8C8C8;
+      --muted: #888888;
+      --border: #333333;
+      --green-soft: #1E2A10;
+      --code-bg: #141414;
+      --code-text: #D8D8D8;
+      --header-bg: #0F0B0B;
+      --logo-color: #FFFFFF;
+      --slide-bg: #0F0B0B;
+    }
+    html, body { height: 100%; color-scheme: light; }
+    [data-theme="dark"] { color-scheme: dark; }
+    body {
+      font-family: var(--sans); background: var(--bg); color: var(--ink);
+      overflow: hidden; transition: background 0.25s, color 0.25s;
+    }
+    .deck { display: flex; flex-direction: column; height: 100vh; }
+
+    /* Header */
+    .deck-header {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.65rem 1.25rem; background: var(--header-bg);
+      border-bottom: 1px solid var(--border); transition: background 0.25s;
+    }
+    .deck-header-left { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+    .logo { height: 20px; width: auto; color: var(--logo-color); flex-shrink: 0; }
+    .deck-title { font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
+    .section-tabs { display: none; flex-wrap: wrap; gap: 0.35rem; }
+    @media (min-width: 768px) { .section-tabs { display: flex; } }
+    .section-tab {
+      padding: 0.3rem 0.65rem; border-radius: 999px; border: 1px solid transparent;
+      background: transparent; color: var(--muted); font-size: 0.68rem; font-weight: 600;
+      cursor: pointer; font-family: var(--sans); transition: all 0.2s;
+    }
+    .section-tab:hover { color: var(--green); }
+    .section-tab.active { color: var(--green); background: var(--green-soft); border-color: var(--border); }
+    .deck-header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+    .slide-counter { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+    .theme-toggle {
+      display: flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border); border-radius: 4px; background: var(--surface);
+      color: var(--ink); font-size: 0.68rem; font-weight: 600; cursor: pointer; font-family: var(--sans);
+    }
+    .theme-toggle:hover { border-color: var(--green); color: var(--green); }
+    .theme-toggle svg { width: 13px; height: 13px; fill: currentColor; }
+
+    /* Main slide area */
+    .deck-main { flex: 1; min-height: 0; position: relative; overflow: hidden; background: var(--slide-bg); }
+    .slide {
+      position: absolute; inset: 0; overflow-y: auto; padding: 1.75rem 1.5rem 2rem;
+      opacity: 0; pointer-events: none; transform: translateX(24px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+    .slide.exit-left { transform: translateX(-24px); }
+    .slide-inner { max-width: 960px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+
+    .slide-label {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green);
+    }
+    .slide-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    .slide h2 {
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 700; line-height: 1.15;
+      letter-spacing: -0.02em; margin-bottom: 1.25rem; max-width: 28ch;
+    }
+    .slide h2::after {
+      content: ''; display: block; width: 36px; height: 3px; background: var(--green); margin-top: 0.45rem;
+    }
+    .slide-body { flex: 1; min-height: 0; }
+
+    /* Primitives */
+    .lead { font-size: 1.05rem; line-height: 1.6; color: var(--text); max-width: 52ch; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; }
+    .grid-2-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    @media (max-width: 700px) { .grid-2, .grid-3, .grid-2-1 { grid-template-columns: 1fr; } }
+    .span-2 { grid-column: span 2; }
+    @media (max-width: 700px) { .span-2 { grid-column: span 1; } }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+      padding: 1rem; transition: background 0.25s;
+    }
+    .card h3 { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--ink); }
+    .card p, .card li { font-size: 0.82rem; line-height: 1.55; color: var(--text); }
+    .card-accent { border-left: 3px solid var(--green); background: var(--green-soft); }
+    .card-warn { border-left: 3px solid #B45309; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.7rem; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--green-soft); color: var(--green-dark); font-size: 0.72rem; font-weight: 600;
+    }
+    [data-theme="dark"] .pill { color: var(--green); }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
+
+    ul.bullets { list-style: none; }
+    ul.bullets li {
+      display: flex; gap: 0.5rem; align-items: flex-start; padding: 0.35rem 0;
+      font-size: 0.82rem; color: var(--text); border-bottom: 1px solid var(--border);
+    }
+    ul.bullets li:last-child { border-bottom: none; }
+    ul.bullets li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 0.75rem; margin-top: 0.1rem; }
+
+    .code {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    .code .bar {
+      display: flex; justify-content: space-between; padding: 0.4rem 0.75rem;
+      background: var(--code-bg); border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 0.65rem; color: var(--muted);
+    }
+    .code pre {
+      padding: 0.75rem; overflow-x: auto; font-family: var(--mono);
+      font-size: 0.68rem; line-height: 1.5; color: var(--code-text);
+    }
+
+    /* Ladder / loop / steps */
+    .ladder { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem; margin-bottom: 1rem; }
+    .ladder-step {
+      flex: 1; min-width: 90px; text-align: center; padding: 0.85rem 0.5rem;
+      border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
+    }
+    .ladder-step strong { display: block; font-size: 0.82rem; color: var(--ink); }
+    .ladder-step span { font-size: 0.68rem; color: var(--muted); }
+    .ladder-arrow { display: flex; align-items: center; color: var(--muted); font-size: 1rem; }
+
+    .loop { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.4rem; margin-bottom: 1rem; }
+    .loop-node {
+      width: 120px; text-align: center; padding: 0.85rem 0.5rem;
+      border: 1px solid var(--border); border-radius: 6px; background: var(--green-soft);
+    }
+    .loop-node strong { display: block; font-size: 0.82rem; }
+    .loop-node span { font-size: 0.68rem; color: var(--muted); }
+
+    .step-row {
+      display: flex; align-items: center; gap: 0.65rem; padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border); border-radius: 6px; background: var(--surface); margin-bottom: 0.45rem;
+    }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--green); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+    }
+    .step-row p { font-size: 0.82rem; color: var(--text); margin: 0; }
+
+    .mcp-stack { text-align: center; padding: 1rem; }
+    .mcp-box {
+      display: inline-block; padding: 0.5rem 1rem; border: 1px solid var(--border);
+      border-radius: 4px; font-size: 0.78rem; margin: 0.2rem;
+    }
+    .mcp-box.hl { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); font-weight: 600; }
+    [data-theme="dark"] .mcp-box.hl { color: var(--green); }
+    .mcp-arrow { color: var(--muted); font-size: 0.85rem; margin: 0.25rem 0; }
+
+    .title-slide { justify-content: center; gap: 1.25rem; }
+    .title-slide .lead { font-size: 1.1rem; }
+    .hint { font-size: 0.68rem; color: var(--muted); margin-top: 0.5rem; }
+    .prompt { font-family: var(--mono); font-size: 0.88rem; color: var(--green); margin-bottom: 0.75rem; }
+    .closing { display: flex; align-items: center; gap: 0.65rem; margin-top: 1rem; font-size: 1.05rem; font-weight: 700; }
+
+    /* Progress + footer */
+    .progress-track { flex-shrink: 0; height: 3px; background: var(--border); }
+    .progress-fill { height: 100%; background: var(--green); transition: width 0.3s ease; }
+    .deck-footer {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.55rem 1.25rem; border-top: 1px solid var(--border); background: var(--header-bg);
+    }
+    .nav-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.85rem;
+      border: 1px solid var(--border); border-radius: 4px; background: var(--surface);
+      color: var(--text); font-size: 0.82rem; font-family: var(--sans); cursor: pointer;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-btn.primary { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
+    .nav-btn.primary:hover:not(:disabled) { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
+    .dots { display: flex; gap: 0.35rem; align-items: center; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 999px; background: var(--border); border: none; cursor: pointer; padding: 0;
+      transition: all 0.2s;
+    }
+    .dot.active { width: 20px; background: var(--green); }
+    .dot:hover:not(.active) { background: var(--muted); }
+
+    strong.accent { color: var(--green); }
+    code { font-family: var(--mono); font-size: 0.85em; }
+  </style>
+</head>
+<body>
+<div class="deck">
+  <header class="deck-header">
+    <div class="deck-header-left">
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 28" aria-label="Deloitte">
+        <text x="0" y="22" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="currentColor">Deloitte</text>
+        <circle cx="132" cy="18" r="5" fill="#86BC25"/>
+      </svg>
+      <span class="deck-title">LLMs → Agentic AI</span>
+      <nav class="section-tabs" id="sectionTabs" aria-label="Sections"></nav>
+    </div>
+    <div class="deck-header-right">
+      <span class="slide-counter" id="counter">1 / 20</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-16h2v3h-2V1zm0 19h2v3h-2v-3zM4.2 4.2l2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zm15.5 15.5 2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zM1 11h3v2H1v-2zm19 0h3v2h-3v-2zM4.2 19.8l2.1-2.1 2.1 2.1-2.1 2.1-2.1-2.1zm15.5-15.5 2.1-2.1 2.1 2.1-2.1 2.1-2.1-2.1z"/></svg>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="deck-main" id="deckMain">
+
+    <!-- 0 Title -->
+    <section class="slide active" data-section="Evolution">
+      <div class="slide-inner title-slide">
+        <div class="slide-label">Evolution</div>
+        <h2>From LLMs to Agentic AI</h2>
+        <div class="slide-body">
+          <p class="lead">A hands-on enablement session for the <strong class="accent">IT Cloud Team</strong> — how language models became autonomous agents, and how to build a custom GitHub Copilot plugin that ships infrastructure to Azure with OpenTofu.</p>
+          <div class="pills">
+            <span class="pill">LLM Foundations</span>
+            <span class="pill">Model Context Protocol</span>
+            <span class="pill">VSCode · Azure · OpenTofu</span>
+            <span class="pill">Agent Mode</span>
+            <span class="pill">Custom Copilot Plugin</span>
+          </div>
+          <p class="hint">Use ← → or Space to navigate · click a section tab to jump</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1 What is LLM -->
+    <section class="slide" data-section="Evolution">
+      <div class="slide-inner">
+        <div class="slide-label">Evolution</div>
+        <h2>What an LLM actually is</h2>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>The core idea</h3>
+            <p>An LLM is a very large neural network trained to predict the next token. Everything it "knows" is compressed into weights learned from text. It is a brilliant pattern engine — not a database, not a reasoner with a will.</p>
+          </div>
+          <div class="card card-warn">
+            <h3>Built-in limits</h3>
+            <ul class="bullets">
+              <li>Frozen at a knowledge cutoff</li>
+              <li>No memory between calls</li>
+              <li>Cannot touch your systems</li>
+              <li>Can hallucinate confidently</li>
+            </ul>
+          </div>
+          <div class="card card-accent span-2">
+            <p><strong>Takeaway:</strong> a raw model is a powerful brain in a jar. The rest of this deck is about giving it eyes, hands, and judgment.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 Evolution ladder -->
+    <section class="slide" data-section="Evolution">
+      <div class="slide-inner">
+        <div class="slide-label">Evolution</div>
+        <h2>The five-step climb to agents</h2>
+        <div class="slide-body">
+          <div class="ladder">
+            <div class="ladder-step"><strong>LLM</strong><span>Predicts text</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="ladder-step"><strong>+ RAG</strong><span>Adds knowledge</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="ladder-step"><strong>+ Tools</strong><span>Takes action</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="ladder-step"><strong>+ MCP</strong><span>Standard plumbing</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="ladder-step"><strong>Agent</strong><span>Plans &amp; adapts</span></div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><p><strong class="accent">RAG</strong> retrieves your docs at query time so answers are grounded in current, private knowledge.</p></div>
+            <div class="card"><p><strong class="accent">Tools</strong> let the model call functions — read a file, run a query, hit an API.</p></div>
+            <div class="card"><p><strong class="accent">MCP</strong> standardizes how those tools plug in, so any client talks to any tool.</p></div>
+            <div class="card"><p><strong class="accent">Agents</strong> close the loop: plan, act, observe, and adapt until the goal is met.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Agentic -->
+    <section class="slide" data-section="Evolution">
+      <div class="slide-inner">
+        <div class="slide-label">Evolution</div>
+        <h2>What makes a system "agentic"?</h2>
+        <div class="slide-body">
+          <div class="loop">
+            <div class="loop-node"><strong>Perceive</strong><span>Read context &amp; goal</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="loop-node"><strong>Plan</strong><span>Break into steps</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="loop-node"><strong>Act</strong><span>Call tools / MCP</span></div>
+            <span class="ladder-arrow">→</span>
+            <div class="loop-node"><strong>Reflect</strong><span>Evaluate result</span></div>
+            <span class="ladder-arrow">↻ loop</span>
+          </div>
+          <div class="grid-3">
+            <div class="card"><h3>Autonomy</h3><p>Pursues a goal across many steps without a human prompt for each one.</p></div>
+            <div class="card"><h3>Tool use</h3><p>Decides which tool to call, runs it, and reads the real result.</p></div>
+            <div class="card"><h3>Adaptation</h3><p>Uses feedback — errors, test failures — to correct its own course.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Copilot modes -->
+    <section class="slide" data-section="Evolution">
+      <div class="slide-inner">
+        <div class="slide-label">Evolution</div>
+        <h2>Copilot: from autocomplete to coworker</h2>
+        <div class="slide-body grid-3">
+          <div class="card"><span class="pill">Completions</span><p style="margin-top:0.65rem">Suggests the next line as you type. You stay fully in control of every keystroke.</p></div>
+          <div class="card"><span class="pill">Chat / Edit</span><p style="margin-top:0.65rem">Ask questions, refactor across files. The model proposes; you review and apply.</p></div>
+          <div class="card"><span class="pill">Agent Mode</span><p style="margin-top:0.65rem">Give a goal. It plans, edits files, runs terminal commands, calls MCP tools, and iterates until done.</p></div>
+          <div class="card card-accent span-2" style="grid-column:1/-1">
+            <p><strong>Our target:</strong> Agent Mode driving Azure + OpenTofu through MCP, governed by skills, hooks, and instructions we author ourselves.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 MCP intro -->
+    <section class="slide" data-section="MCP">
+      <div class="slide-inner">
+        <div class="slide-label">MCP</div>
+        <h2>Model Context Protocol — the USB-C for AI</h2>
+        <div class="slide-body">
+          <p class="lead" style="margin-bottom:1rem">MCP is an open standard (now under the Linux Foundation) that defines a single, common way for AI clients to connect to tools and data sources. Build a connector once — every MCP-aware host can use it.</p>
+          <div class="grid-3">
+            <div class="card"><h3>Before MCP</h3><p>N clients × M tools = N×M bespoke integrations. Brittle and unscalable.</p></div>
+            <div class="card"><h3>With MCP</h3><p>One protocol. N + M connectors. Any client, any server, plug-and-play.</p></div>
+            <div class="card"><h3>Under the hood</h3><p>JSON-RPC 2.0 messages over stdio (local) or HTTP/SSE (remote).</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 MCP architecture -->
+    <section class="slide" data-section="MCP">
+      <div class="slide-inner">
+        <div class="slide-label">MCP</div>
+        <h2>MCP architecture &amp; primitives</h2>
+        <div class="slide-body grid-2">
+          <div>
+            <div class="card" style="margin-bottom:0.75rem">
+              <h3>The three roles</h3>
+              <ul class="bullets">
+                <li><strong>Host</strong> — the app (VSCode + Copilot) the user works in</li>
+                <li><strong>Client</strong> — lives in the host, one per server connection</li>
+                <li><strong>Server</strong> — exposes capabilities (GitHub, Azure, Terraform)</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>What servers expose</h3>
+              <ul class="bullets">
+                <li><strong>Tools</strong> — actions the model can invoke</li>
+                <li><strong>Resources</strong> — data/files it can read</li>
+                <li><strong>Prompts</strong> — reusable templated workflows</li>
+              </ul>
+            </div>
+          </div>
+          <div class="card mcp-stack">
+            <div class="mcp-box hl">VSCode + Copilot <small>— Host</small></div>
+            <div class="mcp-arrow">↓</div>
+            <div><span class="mcp-box">Client A</span><span class="mcp-box">Client B</span><span class="mcp-box">Client C</span></div>
+            <div class="mcp-arrow">↓ JSON-RPC 2.0</div>
+            <div><span class="mcp-box hl">GitHub</span><span class="mcp-box hl">Azure</span><span class="mcp-box hl">Terraform</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 Environment -->
+    <section class="slide" data-section="Environment">
+      <div class="slide-inner">
+        <div class="slide-label">Environment</div>
+        <h2>The cloud engineer workbench</h2>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>VSCode extensions</h3>
+            <ul class="bullets">
+              <li>GitHub Copilot + Copilot Chat (Agent Mode)</li>
+              <li>HashiCorp Terraform (works with OpenTofu / HCL)</li>
+              <li>Azure Tools / Azure CLI + Bicep</li>
+              <li>Dev Containers for a reproducible toolchain</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Cloud + IaC stack</h3>
+            <ul class="bullets">
+              <li>OpenTofu CLI (open-source Terraform fork)</li>
+              <li>Azure CLI authenticated to your tenant</li>
+              <li>azurerm provider + remote state in Blob Storage</li>
+              <li>A service principal / managed identity for CI</li>
+            </ul>
+          </div>
+          <div class="card card-accent span-2">
+            <p><strong>Goal:</strong> a workspace where Copilot Agent Mode can read state, plan changes, and apply them safely — all in version control.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 OpenTofu -->
+    <section class="slide" data-section="Environment">
+      <div class="slide-inner">
+        <div class="slide-label">Environment</div>
+        <h2>OpenTofu + Azure: the baseline</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>main.tf</span><span>HCL</span></div>
+            <pre>terraform {
+  required_version = ">= 1.7.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+  }
+  backend "azurerm" {
+    resource_group_name  = "rg-tfstate"
+    storage_account_name = "sttfstateteam"
+    container_name       = "tfstate"
+    key                  = "platform.tfstate"
+  }
+}
+
+provider "azurerm" {
+  features {}
+}</pre>
+          </div>
+          <div>
+            <div class="code" style="margin-bottom:0.75rem">
+              <div class="bar"><span>rg.tf</span><span>HCL</span></div>
+              <pre>resource "azurerm_resource_group" "lz" {
+  name     = "rg-landing-zone-dev"
+  location = "westeurope"
+  tags = {
+    owner       = "cloud-team"
+    managed_by  = "opentofu"
+    environment = "dev"
+  }
+}</pre>
+            </div>
+            <div class="card card-accent">
+              <p><strong>Workflow:</strong> <code>tofu init → tofu plan → tofu apply</code>. Remote state means the agent and the team share one source of truth.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 MCP wiring -->
+    <section class="slide" data-section="Environment">
+      <div class="slide-inner">
+        <div class="slide-label">Environment</div>
+        <h2>Wiring MCP servers into VSCode</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>.vscode/mcp.json</span><span>JSON</span></div>
+            <pre>{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${input:gh_pat}"
+      }
+    },
+    "azure": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@azure/mcp@latest", "server", "start"]
+    },
+    "terraform": {
+      "type": "stdio",
+      "command": "docker",
+      "args": ["run", "-i", "--rm",
+        "hashicorp/terraform-mcp-server"]
+    }
+  },
+  "inputs": [
+    { "id": "gh_pat", "type": "promptString",
+      "description": "GitHub PAT", "password": true }
+  ]
+}</pre>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0.5rem"><p><strong>GitHub MCP</strong> — issues, PRs, repo search, Actions</p></div>
+            <div class="card" style="margin-bottom:0.5rem"><p><strong>Azure MCP</strong> — query subscriptions, resources, AKS, KQL</p></div>
+            <div class="card" style="margin-bottom:0.5rem"><p><strong>Terraform MCP</strong> — registry, modules, provider docs</p></div>
+            <div class="card card-warn"><p>Secrets go through <code>inputs</code>, never hardcoded. VSCode prompts once and stores them securely.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 Agent walkthrough -->
+    <section class="slide" data-section="Agent Mode">
+      <div class="slide-inner">
+        <div class="slide-label">Agent Mode</div>
+        <h2>A request, end to end</h2>
+        <div class="slide-body">
+          <p class="prompt">"Stand up a dev AKS landing zone and open a PR."</p>
+          <div class="step-row"><span class="step-num">1</span><p>Instructions inject your standards (naming, tagging, region policy).</p></div>
+          <div class="step-row"><span class="step-num">2</span><p>Planner agent queries Azure MCP for existing resources + Terraform MCP for module docs.</p></div>
+          <div class="step-row"><span class="step-num">3</span><p>Implementer agent scaffolds .tf files via the OpenTofu skill.</p></div>
+          <div class="step-row"><span class="step-num">4</span><p>PreToolUse hook runs tofu validate + a policy check before any apply.</p></div>
+          <div class="step-row"><span class="step-num">5</span><p>GitHub MCP opens a pull request with the plan output attached.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 Six layers -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Six layers of customization</h2>
+        <div class="slide-body grid-3">
+          <div class="card"><h3>Instructions</h3><p>Always-on rules &amp; context the model applies to every task.</p></div>
+          <div class="card"><h3>Prompt files</h3><p>Reusable, manually-invoked workflows (/deploy, /review).</p></div>
+          <div class="card"><h3>Skills</h3><p>Auto-discovered procedures the agent pulls in when relevant.</p></div>
+          <div class="card"><h3>Custom agents</h3><p>Named personas with their own model, tools, and scope.</p></div>
+          <div class="card"><h3>MCP servers</h3><p>Live connections to external tools and data.</p></div>
+          <div class="card"><h3>Hooks</h3><p>Deterministic scripts on lifecycle events — guardrails.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 Plugin anatomy -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Anatomy of the plugin</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>azure-iac-plugin/</span><span>tree</span></div>
+            <pre>azure-iac-plugin/
+├─ plugin.json            # manifest
+├─ .mcp.json              # bundled MCP servers
+├─ instructions/
+│  └─ terraform.md        # IaC standards
+├─ agents/
+│  ├─ iac-planner.md
+│  └─ iac-implementer.md
+├─ skills/
+│  └─ opentofu-review/
+│     └─ SKILL.md
+├─ prompts/
+│  └─ deploy-landing-zone.md
+└─ hooks/
+   └─ hooks.json + guard.sh</pre>
+          </div>
+          <div class="code">
+            <div class="bar"><span>plugin.json</span><span>JSON</span></div>
+            <pre>{
+  "name": "azure-iac-plugin",
+  "displayName": "Azure IaC Copilot",
+  "version": "1.0.0",
+  "description": "Plan & ship Azure infra with OpenTofu",
+  "publisher": "cloud-team",
+  "contributes": {
+    "agents":       ["./agents"],
+    "skills":       ["./skills"],
+    "instructions": ["./instructions"],
+    "prompts":      ["./prompts"],
+    "mcpServers":   "./.mcp.json",
+    "hooks":        "./hooks/hooks.json"
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 Instructions -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Layer 1 — Instructions</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>instructions/terraform.md</span><span>MD</span></div>
+            <pre>---
+applyTo: "**/*.tf"
+---
+# OpenTofu / Azure standards
+
+- Pin every provider with a ~> constraint.
+- Never hardcode secrets — read from
+  Azure Key Vault data sources.
+- All resources carry owner, environment,
+  and managed_by tags.
+- Default region is westeurope unless the
+  user states otherwise.
+- Use remote azurerm backend; never local
+  state.
+- Resource names follow:
+  &lt;type&gt;-&lt;workload&gt;-&lt;env&gt; (rg-payments-dev).</pre>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0.75rem"><h3>Why this matters</h3><p>Instructions are applied automatically to matching files via <code>applyTo</code> globs. The agent inherits your team's conventions without anyone re-typing them.</p></div>
+            <div class="card"><h3>Scope wisely</h3><p>Keep them short and rule-like. Long essays dilute attention — prefer crisp, testable constraints.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 Skills -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Layer 2 — Skills</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>skills/opentofu-review/SKILL.md</span><span>MD</span></div>
+            <pre>---
+name: opentofu-review
+description: Validate & review an OpenTofu
+  module before plan/apply. Use whenever
+  .tf files change.
+---
+# OpenTofu module review
+
+When invoked:
+1. Run `tofu fmt -check` and fix drift.
+2. Run `tofu validate`.
+3. Confirm all providers are version-pinned.
+4. Flag any resource missing required tags.
+5. Confirm no plaintext secrets exist.
+6. Summarise findings as a checklist.</pre>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0.75rem"><h3>Progressive disclosure</h3><p>The agent reads only the <code>description</code> until a task matches — then loads the full skill. Cheap to have many.</p></div>
+            <div class="card"><h3>Skills vs prompts</h3><p>Skills are <strong>auto-discovered</strong> by the agent; prompt files are <strong>manually invoked</strong> by the user with a slash command.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 Agents -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Layer 3 — Custom agents</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>agents/iac-planner.md</span><span>MD</span></div>
+            <pre>---
+name: iac-planner
+description: Designs Azure architecture and
+  produces an OpenTofu plan. Read-only.
+tools:
+  - codebase
+  - azure-mcp
+  - terraform-mcp
+handoffs:
+  - iac-implementer
+---
+You are a senior cloud architect. Inspect
+the current Azure estate and the repo, then
+propose a minimal, well-tagged OpenTofu
+change set. Do NOT write files — hand off to
+iac-implementer once the user approves.</pre>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0.75rem"><h3>Least privilege</h3><p>The planner gets read-only tools. Only the <code>iac-implementer</code> can edit files and run <code>apply</code>.</p></div>
+            <div class="card"><h3>Handoffs</h3><p>Agents delegate to one another, forming a small team: architect → builder → reviewer. Each has a focused persona and toolset.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 Hooks -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Layer 4 — Hooks (guardrails)</h2>
+        <div class="slide-body grid-2">
+          <div class="code">
+            <div class="bar"><span>hooks/hooks.json</span><span>JSON</span></div>
+            <pre>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_in_terminal",
+        "command": "./hooks/guard.sh",
+        "description": "Block tofu apply without an approved plan"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "edit_file",
+        "command": "tofu fmt -recursive",
+        "description": "Auto-format HCL after edits"
+      }
+    ]
+  }
+}</pre>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0.75rem"><h3>Deterministic, not probabilistic</h3><p>Hooks are plain scripts on lifecycle events (<code>PreToolUse, PostToolUse, SessionStart…</code>). They <strong>always</strong> run — unlike a model that might forget.</p></div>
+            <div class="card"><h3>Hard stops</h3><p>A non-zero exit can block a destructive action — e.g. refuse <code>tofu apply</code> in prod without a reviewed plan.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 Security -->
+    <section class="slide" data-section="Build a Plugin">
+      <div class="slide-inner">
+        <div class="slide-label">Build a Plugin</div>
+        <h2>Security &amp; governance</h2>
+        <div class="slide-body grid-2">
+          <div class="card"><h3>Trust your MCP sources</h3><p>Only add servers you trust. Treat third-party tools like any dependency — review before enabling.</p></div>
+          <div class="card"><h3>Org policy controls</h3><p>Enterprises can centrally allow/deny MCP servers and require approval for new tools.</p></div>
+          <div class="card"><h3>Secrets via Key Vault</h3><p>No credentials in code or config. Use input prompts, Key Vault, and managed identities.</p></div>
+          <div class="card"><h3>Human in the loop</h3><p>Require approval for terminal commands and destructive ops. Hooks enforce it deterministically.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 Roadmap -->
+    <section class="slide" data-section="Wrap-up">
+      <div class="slide-inner">
+        <div class="slide-label">Wrap-up</div>
+        <h2>Adoption roadmap</h2>
+        <div class="slide-body">
+          <div class="step-row"><span class="step-num">P1</span><p><strong>Standardize the workspace</strong> — extensions, OpenTofu, dev container.</p></div>
+          <div class="step-row"><span class="step-num">P2</span><p><strong>Add MCP servers:</strong> GitHub, Azure, Terraform. Test in Agent Mode.</p></div>
+          <div class="step-row"><span class="step-num">P3</span><p><strong>Author instructions</strong> encoding your IaC &amp; naming standards.</p></div>
+          <div class="step-row"><span class="step-num">P4</span><p><strong>Build skills + the planner/implementer agent team.</strong></p></div>
+          <div class="step-row"><span class="step-num">P5</span><p><strong>Add hooks</strong> for validation and destructive-action guardrails.</p></div>
+          <div class="step-row"><span class="step-num">P6</span><p><strong>Package as a plugin;</strong> publish internally for the whole team.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 Closing -->
+    <section class="slide" data-section="Wrap-up">
+      <div class="slide-inner">
+        <div class="slide-label">Wrap-up</div>
+        <h2>Key takeaways</h2>
+        <div class="slide-body">
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="card"><p>An LLM is a pattern engine. Tools, context, and a loop turn it into an <strong>agent</strong>.</p></div>
+            <div class="card"><p><strong>MCP</strong> is the universal connector — build once, use everywhere.</p></div>
+            <div class="card"><p>VSCode + OpenTofu + Azure MCP gives the agent a real, governed sandbox.</p></div>
+            <div class="card"><p>A <strong>plugin</strong> bundles instructions, skills, agents, MCP, and hooks into one shippable unit.</p></div>
+          </div>
+          <div class="closing"><span style="color:var(--green)">●</span> Let's build the Azure IaC Copilot plugin together.</div>
+          <p class="hint" style="margin-top:1rem">Tooling evolves fast — verify exact manifest keys and MCP server names against current docs before rollout.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <footer class="deck-footer">
+    <button class="nav-btn" id="prevBtn" type="button" disabled>← Prev</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn primary" id="nextBtn" type="button">Next →</button>
+  </footer>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const sections = ['Evolution', 'MCP', 'Environment', 'Agent Mode', 'Build a Plugin', 'Wrap-up'];
+  let current = 0;
+
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const dotsEl = document.getElementById('dots');
+  const sectionTabsEl = document.getElementById('sectionTabs');
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeLabel = document.getElementById('themeLabel');
+
+  function firstIndexOf(section) {
+    return slides.findIndex(s => s.dataset.section === section);
+  }
+
+  sections.forEach(sec => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'section-tab';
+    btn.textContent = sec;
+    btn.addEventListener('click', () => go(firstIndexOf(sec)));
+    sectionTabsEl.appendChild(btn);
+  });
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot';
+    dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    dot.addEventListener('click', () => go(i));
+    dotsEl.appendChild(dot);
+  });
+
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    themeLabel.textContent = theme === 'dark' ? 'Light' : 'Dark';
+    localStorage.setItem('cloud-training-slides-theme', theme);
+  }
+
+  const urlTheme = new URLSearchParams(location.search).get('theme');
+  const savedTheme = localStorage.getItem('cloud-training-slides-theme');
+  if (urlTheme === 'dark' || urlTheme === 'light') applyTheme(urlTheme);
+  else if (savedTheme === 'dark' || savedTheme === 'light') applyTheme(savedTheme);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  function go(n) {
+    if (n < 0 || n >= slides.length || n === current) return;
+    slides[current].classList.remove('active');
+    slides[n].classList.add('active');
+    current = n;
+    updateUI();
+  }
+
+  function updateUI() {
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    progressFill.style.width = ((current + 1) / slides.length * 100) + '%';
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    const sec = slides[current].dataset.section;
+    document.querySelectorAll('.section-tab').forEach(tab => {
+      tab.classList.toggle('active', tab.textContent === sec);
+    });
+    dotsEl.querySelectorAll('.dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === current);
+    });
+  }
+
+  prevBtn.addEventListener('click', () => go(current - 1));
+  nextBtn.addEventListener('click', () => go(current + 1));
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
