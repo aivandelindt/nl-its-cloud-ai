@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Adoption Roadmap — Deloitte</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+      --green: #86BC25;
+      --green-dark: #6B9619;
+      --green-soft: #EEF6E0;
+      --black: #0F0B0B;
+      --bg: #FFFFFF;
+      --surface: #FFFFFF;
+      --ink: #0F0B0B;
+      --text: #3D3D3D;
+      --muted: #757575;
+      --border: #E0E0E0;
+      --warn: #B45309;
+      --header-bg: #FFFFFF;
+      --logo-color: #0F0B0B;
+      --slide-bg: #FFFFFF;
+    }
+    [data-theme="dark"] {
+      --bg: #0F0B0B;
+      --surface: #1A1818;
+      --ink: #F5F5F5;
+      --text: #C8C8C8;
+      --muted: #888888;
+      --border: #333333;
+      --green-soft: #1E2A10;
+      --header-bg: #0F0B0B;
+      --logo-color: #FFFFFF;
+      --slide-bg: #0F0B0B;
+    }
+    html, body { height: 100%; color-scheme: light; }
+    [data-theme="dark"] { color-scheme: dark; }
+    body {
+      font-family: var(--sans); background: var(--bg); color: var(--ink);
+      overflow: hidden; transition: background 0.25s, color 0.25s;
+    }
+    .deck { display: flex; flex-direction: column; height: 100vh; }
+
+    .deck-header {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.65rem 1.25rem; background: var(--header-bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .deck-header-left { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+    .logo { height: 20px; color: var(--logo-color); flex-shrink: 0; }
+    .deck-title { font-size: 0.85rem; font-weight: 700; white-space: nowrap; }
+    .section-tabs { display: none; flex-wrap: wrap; gap: 0.3rem; }
+    @media (min-width: 900px) { .section-tabs { display: flex; } }
+    .section-tab {
+      padding: 0.28rem 0.55rem; border-radius: 999px; border: 1px solid transparent;
+      background: transparent; color: var(--muted); font-size: 0.65rem; font-weight: 600;
+      cursor: pointer; font-family: var(--sans);
+    }
+    .section-tab:hover { color: var(--green); }
+    .section-tab.active { color: var(--green); background: var(--green-soft); border-color: var(--border); }
+    .deck-header-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+    .slide-counter { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+    .theme-toggle {
+      display: flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem;
+      border: 1px solid var(--border); border-radius: 4px; background: var(--surface);
+      color: var(--ink); font-size: 0.68rem; font-weight: 600; cursor: pointer; font-family: var(--sans);
+    }
+    .theme-toggle:hover { border-color: var(--green); color: var(--green); }
+    .theme-toggle svg { width: 13px; height: 13px; fill: currentColor; }
+
+    .deck-main { flex: 1; min-height: 0; position: relative; overflow: hidden; background: var(--slide-bg); }
+    .slide {
+      position: absolute; inset: 0; overflow-y: auto; padding: 1.5rem 1.5rem 1.75rem;
+      opacity: 0; pointer-events: none; transform: translateX(20px);
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); }
+    .slide-inner { max-width: 980px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+
+    .slide-label {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green);
+    }
+    .slide-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    .slide h2 {
+      font-size: clamp(1.4rem, 3.2vw, 2rem); font-weight: 700; line-height: 1.15;
+      letter-spacing: -0.02em; margin-bottom: 0.35rem;
+    }
+    .slide h2::after {
+      content: ''; display: block; width: 36px; height: 3px; background: var(--green); margin-top: 0.4rem; margin-bottom: 0.85rem;
+    }
+    .phase-meta { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.85rem; }
+    .phase-meta strong { color: var(--green); font-weight: 700; }
+    .slide-body { flex: 1; min-height: 0; }
+
+    .lead { font-size: 1rem; line-height: 1.6; color: var(--text); max-width: 58ch; }
+    .title-slide { justify-content: center; gap: 1rem; }
+    .title-slide .lead { font-size: 1.05rem; }
+    .hint { font-size: 0.68rem; color: var(--muted); margin-top: 0.75rem; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    @media (max-width: 700px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem;
+    }
+    .card h3 {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 0.45rem;
+    }
+    .card p, .card li { font-size: 0.78rem; line-height: 1.5; color: var(--text); }
+    .card-accent { border-left: 3px solid var(--green); background: var(--green-soft); }
+    .card-warn { border-left: 3px solid var(--warn); }
+
+    .pill {
+      display: inline-block; padding: 0.28rem 0.6rem; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--green-soft);
+      color: var(--green-dark); font-size: 0.68rem; font-weight: 600;
+    }
+    [data-theme="dark"] .pill { color: var(--green); }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+
+    ul.bullets { list-style: none; }
+    ul.bullets li {
+      display: flex; gap: 0.45rem; align-items: flex-start; padding: 0.28rem 0;
+      font-size: 0.76rem; color: var(--text); border-bottom: 1px solid var(--border);
+    }
+    ul.bullets li:last-child { border-bottom: none; }
+    ul.bullets li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 0.7rem; margin-top: 0.08rem; flex-shrink: 0; }
+    ul.bullets.risks li::before { content: '⚠'; color: var(--warn); }
+
+    .tag {
+      font-family: var(--mono); font-size: 0.65rem; padding: 0.3rem 0.5rem;
+      border: 1px solid var(--border); border-radius: 4px; color: var(--text); display: inline-block; margin: 0.15rem;
+    }
+
+    /* Timeline overview */
+    .timeline { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0 1rem; }
+    .tl-phase {
+      flex: 1; min-width: 130px; padding: 0.75rem; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--surface); position: relative;
+    }
+    .tl-phase::before {
+      content: attr(data-num); position: absolute; top: -10px; left: 10px;
+      width: 22px; height: 22px; border-radius: 50%; background: var(--green); color: #fff;
+      font-size: 0.68rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+    .tl-phase strong { display: block; font-size: 0.78rem; margin-top: 0.35rem; color: var(--ink); }
+    .tl-phase span { font-size: 0.65rem; color: var(--muted); }
+    .tl-dur { font-size: 0.62rem; color: var(--green); font-weight: 600; margin-top: 0.25rem; display: block; }
+
+    .phase-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 50%; background: var(--green);
+      color: #fff; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem;
+    }
+
+    .exit-box {
+      padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--green-soft); font-size: 0.78rem; line-height: 1.5; color: var(--text);
+    }
+
+    .progress-track { flex-shrink: 0; height: 3px; background: var(--border); }
+    .progress-fill { height: 100%; background: var(--green); transition: width 0.3s ease; }
+    .deck-footer {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+      padding: 0.55rem 1.25rem; border-top: 1px solid var(--border); background: var(--header-bg);
+    }
+    .nav-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.85rem;
+      border: 1px solid var(--border); border-radius: 4px; background: var(--surface);
+      color: var(--text); font-size: 0.82rem; font-family: var(--sans); cursor: pointer;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--green); color: var(--green); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-btn.primary { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
+    .nav-btn.primary:hover:not(:disabled) { background: var(--green-dark); border-color: var(--green-dark); color: #fff; }
+    .dots { display: flex; gap: 0.35rem; align-items: center; flex-wrap: wrap; justify-content: center; max-width: 50%; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 999px; background: var(--border); border: none; cursor: pointer; padding: 0;
+    }
+    .dot.active { width: 18px; background: var(--green); }
+
+    strong.accent { color: var(--green); }
+  </style>
+</head>
+<body>
+<div class="deck">
+  <header class="deck-header">
+    <div class="deck-header-left">
+      <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 28" aria-label="Deloitte">
+        <text x="0" y="22" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="currentColor">Deloitte</text>
+        <circle cx="132" cy="18" r="5" fill="#86BC25"/>
+      </svg>
+      <span class="deck-title">AI Adoption Roadmap</span>
+      <nav class="section-tabs" id="sectionTabs" aria-label="Phases"></nav>
+    </div>
+    <div class="deck-header-right">
+      <span class="slide-counter" id="counter">1 / 9</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-16h2v3h-2V1zm0 19h2v3h-2v-3zM4.2 4.2l2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zm15.5 15.5 2.1 2.1-2.1 2.1-2.1-2.1 2.1-2.1zM1 11h3v2H1v-2zm19 0h3v2h-3v-2zM4.2 19.8l2.1-2.1 2.1 2.1-2.1 2.1-2.1-2.1zm15.5-15.5 2.1-2.1 2.1 2.1-2.1 2.1-2.1-2.1z"/></svg>
+        <span id="themeLabel">Dark</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="deck-main" id="deckMain">
+
+    <!-- 0 Title -->
+    <section class="slide active" data-section="Overview">
+      <div class="slide-inner title-slide">
+        <div class="slide-label">IT Cloud · Enablement</div>
+        <h2>Agentic AI Adoption Roadmap</h2>
+        <div class="slide-body">
+          <p class="lead">Six sequential phases from a standardized workspace to a shipped, governed <strong class="accent">Azure IaC Copilot plugin</strong> — enabling the IT Cloud Team to adopt Agent Mode with MCP, skills, agents, and hooks.</p>
+          <div class="pills" style="margin-top:1rem">
+            <span class="pill">13–17 weeks</span>
+            <span class="pill">2–3 person platform team</span>
+            <span class="pill">VSCode · OpenTofu · Azure</span>
+            <span class="pill">GitHub Copilot Plugin</span>
+          </div>
+          <p class="hint">Use ← → or Space to navigate · click a phase tab to jump</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1 Overview timeline -->
+    <section class="slide" data-section="Overview">
+      <div class="slide-inner">
+        <div class="slide-label">Overview</div>
+        <h2>Roadmap at a glance</h2>
+        <div class="slide-body">
+          <p class="lead" style="margin-bottom:0.75rem">Phases run roughly sequentially with some overlap. Each phase has clear deliverables, owners, and exit criteria before moving on.</p>
+          <div class="timeline">
+            <div class="tl-phase" data-num="1"><strong>Standardize Workspace</strong><span>Dev container, extensions, CLIs</span><span class="tl-dur">~2 weeks</span></div>
+            <div class="tl-phase" data-num="2"><strong>Add MCP Servers</strong><span>GitHub, Azure, Terraform</span><span class="tl-dur">~2 weeks</span></div>
+            <div class="tl-phase" data-num="3"><strong>Author Instructions</strong><span>IaC naming &amp; tagging rules</span><span class="tl-dur">~2 weeks</span></div>
+            <div class="tl-phase" data-num="4"><strong>Skills + Agent Team</strong><span>Planner → implementer handoffs</span><span class="tl-dur">~3–4 weeks</span></div>
+            <div class="tl-phase" data-num="5"><strong>Add Hooks</strong><span>Validation &amp; hard stops</span><span class="tl-dur">~2 weeks</span></div>
+            <div class="tl-phase" data-num="6"><strong>Package &amp; Publish</strong><span>Internal plugin rollout</span><span class="tl-dur">~2–3 weeks</span></div>
+          </div>
+          <div class="card card-accent">
+            <p><strong>North star:</strong> The whole IT Cloud Team installs one plugin and inherits the full governed setup — standards, agents, and guardrails — with a clear owner and update process.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 Phase 1 -->
+    <section class="slide" data-section="Phase 1">
+      <div class="slide-inner">
+        <div class="slide-label">Phase 1 · ~2 weeks</div>
+        <div class="phase-badge">1</div>
+        <h2>Standardize the Workspace</h2>
+        <p class="phase-meta">A reproducible toolchain every engineer can spin up in <strong>under an hour</strong></p>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>Objective</h3>
+            <p>Eliminate "works on my machine" by codifying the entire local dev environment — editor, extensions, CLIs, and a dev container — so onboarding is a single command.</p>
+          </div>
+          <div class="card">
+            <h3>Owners</h3>
+            <p>Platform lead + 1 engineer</p>
+            <h3 style="margin-top:0.75rem">Deliverables</h3>
+            <span class="tag">devcontainer.json + Dockerfile</span>
+            <span class="tag">.vscode/extensions.json</span>
+            <span class="tag">SETUP.md</span>
+          </div>
+          <div class="card">
+            <h3>Task checklist</h3>
+            <ul class="bullets">
+              <li>Pin VSCode extensions: Copilot, Copilot Chat, Terraform, Azure Tools, Bicep</li>
+              <li>Version-pin OpenTofu and Azure CLI; document supported versions</li>
+              <li>Author devcontainer.json with OpenTofu, Azure CLI, LSP, shell tooling</li>
+              <li>Add extensions.json so the editor prompts on clone</li>
+              <li>Write SETUP.md with one-command bootstrap flow</li>
+              <li>Validate container builds on mac + Windows/WSL</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Exit criteria</h3>
+            <div class="exit-box">A new engineer goes from git clone to a working OpenTofu + Azure environment in under 60 minutes, with zero manual tool installs.</div>
+            <h3 style="margin-top:0.75rem">Risks</h3>
+            <ul class="bullets risks">
+              <li>Tool version drift across OS — pin everything and test each platform</li>
+              <li>Corporate proxy blocking image pulls — pre-mirror images internally</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Phase 2 -->
+    <section class="slide" data-section="Phase 2">
+      <div class="slide-inner">
+        <div class="slide-label">Phase 2 · ~2 weeks</div>
+        <div class="phase-badge">2</div>
+        <h2>Add MCP Servers</h2>
+        <p class="phase-meta">Give the agent <strong>eyes and hands</strong>: GitHub, Azure, and Terraform over MCP</p>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>Objective</h3>
+            <p>Connect Copilot Agent Mode to live tooling through trusted MCP servers, with secrets handled securely, and prove the agent can read real state and act.</p>
+          </div>
+          <div class="card">
+            <h3>Owners</h3>
+            <p>Platform lead + security reviewer</p>
+            <h3 style="margin-top:0.75rem">Deliverables</h3>
+            <span class="tag">.vscode/mcp.json</span>
+            <span class="tag">Secrets runbook</span>
+            <span class="tag">MCP allow-list</span>
+          </div>
+          <div class="card">
+            <h3>Task checklist</h3>
+            <ul class="bullets">
+              <li>Create .vscode/mcp.json for GitHub, Azure, and Terraform MCP servers</li>
+              <li>Route credentials through input prompts / Key Vault — nothing hardcoded</li>
+              <li>Security review each server before enabling</li>
+              <li>Smoke-test: query subscription, search repo, fetch module doc</li>
+              <li>Guided Agent Mode session: "summarise our dev resource group"</li>
+              <li>Document allow-list and how to request new servers</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Exit criteria</h3>
+            <div class="exit-box">In Agent Mode an engineer can ask a natural-language question that triggers a real Azure query and a GitHub action (e.g. open a draft PR), end to end.</div>
+            <h3 style="margin-top:0.75rem">Risks</h3>
+            <ul class="bullets risks">
+              <li>Over-permissioned service principals — start read-only, widen deliberately</li>
+              <li>Untrusted third-party servers — only enable reviewed, allow-listed sources</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Phase 3 -->
+    <section class="slide" data-section="Phase 3">
+      <div class="slide-inner">
+        <div class="slide-label">Phase 3 · ~2 weeks</div>
+        <div class="phase-badge">3</div>
+        <h2>Author Instructions</h2>
+        <p class="phase-meta">Encode IaC, naming, and tagging standards as <strong>always-on rules</strong></p>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>Objective</h3>
+            <p>Capture the team's conventions as scoped instruction files so generated code follows your standards automatically, without anyone re-typing them.</p>
+          </div>
+          <div class="card">
+            <h3>Owners</h3>
+            <p>Senior cloud engineers (standards owners)</p>
+            <h3 style="margin-top:0.75rem">Deliverables</h3>
+            <span class="tag">instructions/terraform.md</span>
+            <span class="tag">Naming + tagging standard</span>
+            <span class="tag">Before/after evidence</span>
+          </div>
+          <div class="card">
+            <h3>Task checklist</h3>
+            <ul class="bullets">
+              <li>Document naming convention &lt;type&gt;-&lt;workload&gt;-&lt;env&gt; and required tags</li>
+              <li>Define region policy, provider-pinning, no-plaintext-secrets rule</li>
+              <li>Write instructions/terraform.md with applyTo **/*.tf</li>
+              <li>Keep rules crisp and testable — short constraints, not essays</li>
+              <li>A/B test: generate same module with and without instructions</li>
+              <li>Iterate until generated HCL passes review with minimal edits</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Exit criteria</h3>
+            <div class="exit-box">Code the agent generates conforms to naming, tagging, region, and provider-pinning standards on the first pass, with reviewers making only minor edits.</div>
+            <h3 style="margin-top:0.75rem">Risks</h3>
+            <ul class="bullets risks">
+              <li>Instruction bloat diluting model attention — keep them short and rule-like</li>
+              <li>Conflicting or stale rules — assign a single standards owner</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 Phase 4 -->
+    <section class="slide" data-section="Phase 4">
+      <div class="slide-inner">
+        <div class="slide-label">Phase 4 · ~3–4 weeks</div>
+        <div class="phase-badge">4</div>
+        <h2>Build Skills + Agent Team</h2>
+        <p class="phase-meta">Reusable procedures plus a <strong>planner → implementer</strong> team</p>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>Objective</h3>
+            <p>Move from ad-hoc prompting to repeatable workflows: auto-discovered skills for common procedures and a small team of scoped agents that delegate to each other.</p>
+          </div>
+          <div class="card">
+            <h3>Owners</h3>
+            <p>Platform team (2–3 engineers)</p>
+            <h3 style="margin-top:0.75rem">Deliverables</h3>
+            <span class="tag">skills/opentofu-review</span>
+            <span class="tag">agents/iac-planner.md</span>
+            <span class="tag">agents/iac-implementer.md</span>
+          </div>
+          <div class="card">
+            <h3>Task checklist</h3>
+            <ul class="bullets">
+              <li>Author skills/opentofu-review/SKILL.md for auto-discovery</li>
+              <li>Build read-only iac-planner (codebase + azure-mcp + terraform-mcp)</li>
+              <li>Build iac-implementer that can edit files and run plan/apply</li>
+              <li>Define handoffs: planner delegates after user approval</li>
+              <li>Least privilege: only implementer gets write/apply tools</li>
+              <li>End-to-end rehearsal: small landing-zone change through full team</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Exit criteria</h3>
+            <div class="exit-box">The agent team completes a realistic task — plan a dev landing zone, scaffold the .tf files, and self-review — with a human approving the transition between plan and apply.</div>
+            <h3 style="margin-top:0.75rem">Risks</h3>
+            <ul class="bullets risks">
+              <li>Agents exceeding scope — enforce least-privilege tool lists per agent</li>
+              <li>Skill descriptions too vague — write task-matching summaries</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 Phase 5 -->
+    <section class="slide" data-section="Phase 5">
+      <div class="slide-inner">
+        <div class="slide-label">Phase 5 · ~2 weeks</div>
+        <div class="phase-badge">5</div>
+        <h2>Add Hooks (Guardrails)</h2>
+        <p class="phase-meta">Deterministic scripts that <strong>always run</strong> — formatting, validation, hard stops</p>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>Objective</h3>
+            <p>Layer in non-probabilistic guardrails on lifecycle events so destructive actions are blocked and quality checks run every time — regardless of what the model decides.</p>
+          </div>
+          <div class="card">
+            <h3>Owners</h3>
+            <p>Platform + security</p>
+            <h3 style="margin-top:0.75rem">Deliverables</h3>
+            <span class="tag">hooks/hooks.json</span>
+            <span class="tag">hooks/guard.sh</span>
+            <span class="tag">Guardrail docs</span>
+          </div>
+          <div class="card">
+            <h3>Task checklist</h3>
+            <ul class="bullets">
+              <li>Define hooks/hooks.json with PreToolUse and PostToolUse handlers</li>
+              <li>Write guard.sh to block tofu apply without an approved plan</li>
+              <li>PostToolUse hook: tofu fmt -recursive after edits</li>
+              <li>Test hard-stop: non-zero exit cancels destructive op</li>
+              <li>Wire tofu validate + policy check into pre-apply gate</li>
+              <li>Document hook behaviour for engineers</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Exit criteria</h3>
+            <div class="exit-box">A tofu apply against prod without a reviewed plan is reliably blocked by the hook, and HCL is auto-formatted after every agent edit — with no reliance on the model remembering.</div>
+            <h3 style="margin-top:0.75rem">Risks</h3>
+            <ul class="bullets risks">
+              <li>Over-aggressive hooks blocking legitimate work — log clearly, allow override paths</li>
+              <li>Hooks not running on all machines — ship them inside the plugin (Phase 6)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 Phase 6 -->
+    <section class="slide" data-section="Phase 6">
+      <div class="slide-inner">
+        <div class="slide-label">Phase 6 · ~2–3 weeks</div>
+        <div class="phase-badge">6</div>
+        <h2>Package &amp; Publish</h2>
+        <p class="phase-meta">Bundle everything into <strong>one shippable plugin</strong> for the whole team</p>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>Objective</h3>
+            <p>Consolidate instructions, skills, agents, MCP servers, and hooks into a single versioned plugin, publish it internally, and drive team-wide adoption.</p>
+          </div>
+          <div class="card">
+            <h3>Owners</h3>
+            <p>Platform lead + enablement</p>
+            <h3 style="margin-top:0.75rem">Deliverables</h3>
+            <span class="tag">Packaged plugin</span>
+            <span class="tag">Install docs</span>
+            <span class="tag">Maintenance plan</span>
+          </div>
+          <div class="card">
+            <h3>Task checklist</h3>
+            <ul class="bullets">
+              <li>Create plugin.json manifest wiring all six customization layers</li>
+              <li>Bundle .mcp.json so servers and hooks travel with the plugin</li>
+              <li>Version with semver and write a CHANGELOG</li>
+              <li>Publish to internal registry / shared repo with install instructions</li>
+              <li>Run an enablement session and capture a feedback channel</li>
+              <li>Define ownership + update cadence (who maintains, how fixes ship)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Exit criteria</h3>
+            <div class="exit-box">The whole IT Cloud Team installs one plugin and inherits the full governed setup — standards, agents, and guardrails — with a clear owner and update process in place.</div>
+            <h3 style="margin-top:0.75rem">Risks</h3>
+            <ul class="bullets risks">
+              <li>Manifest keys / MCP names drifting with vendor updates — verify docs before each release</li>
+              <li>Adoption stalling — pair launch with hands-on enablement, not just a link</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 Closing -->
+    <section class="slide" data-section="Wrap-up">
+      <div class="slide-inner title-slide">
+        <div class="slide-label">Wrap-up</div>
+        <h2>Ready to execute</h2>
+        <div class="slide-body">
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="card"><p><strong class="accent">Phase 1–2</strong> lay the foundation: reproducible workspace + live MCP connections.</p></div>
+            <div class="card"><p><strong class="accent">Phase 3–4</strong> encode standards and build the agent team that ships IaC.</p></div>
+            <div class="card"><p><strong class="accent">Phase 5–6</strong> add deterministic guardrails and package for team-wide rollout.</p></div>
+            <div class="card card-accent"><p><strong>Let's build the Azure IaC Copilot plugin together.</strong></p></div>
+          </div>
+          <p class="hint">Timelines assume a 2–3 person platform team running phases roughly sequentially. Verify exact plugin manifest keys, MCP server package names, and hook event names against current GitHub Copilot &amp; MCP documentation before each release.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+  <footer class="deck-footer">
+    <button class="nav-btn" id="prevBtn" type="button" disabled>← Prev</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn primary" id="nextBtn" type="button">Next →</button>
+  </footer>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const sections = ['Overview', 'Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5', 'Phase 6', 'Wrap-up'];
+  let current = 0;
+
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const dotsEl = document.getElementById('dots');
+  const sectionTabsEl = document.getElementById('sectionTabs');
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeLabel = document.getElementById('themeLabel');
+
+  function firstIndexOf(section) {
+    return slides.findIndex(s => s.dataset.section === section);
+  }
+
+  sections.forEach(sec => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'section-tab';
+    btn.textContent = sec === 'Overview' ? 'Overview' : sec.replace('Phase ', 'P');
+    btn.addEventListener('click', () => go(firstIndexOf(sec)));
+    sectionTabsEl.appendChild(btn);
+  });
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.className = 'dot';
+    dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    dot.addEventListener('click', () => go(i));
+    dotsEl.appendChild(dot);
+  });
+
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    themeLabel.textContent = theme === 'dark' ? 'Light' : 'Dark';
+    localStorage.setItem('cloud-training-roadmap-theme', theme);
+  }
+
+  const urlTheme = new URLSearchParams(location.search).get('theme');
+  const savedTheme = localStorage.getItem('cloud-training-roadmap-theme');
+  if (urlTheme === 'dark' || urlTheme === 'light') applyTheme(urlTheme);
+  else if (savedTheme === 'dark' || savedTheme === 'light') applyTheme(savedTheme);
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  function go(n) {
+    if (n < 0 || n >= slides.length || n === current) return;
+    slides[current].classList.remove('active');
+    slides[n].classList.add('active');
+    current = n;
+    updateUI();
+  }
+
+  function updateUI() {
+    counter.textContent = (current + 1) + ' / ' + slides.length;
+    progressFill.style.width = ((current + 1) / slides.length * 100) + '%';
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+    const sec = slides[current].dataset.section;
+    document.querySelectorAll('.section-tab').forEach((tab, i) => {
+      tab.classList.toggle('active', sections[i] === sec);
+    });
+    dotsEl.querySelectorAll('.dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === current);
+    });
+  }
+
+  prevBtn.addEventListener('click', () => go(current - 1));
+  nextBtn.addEventListener('click', () => go(current + 1));
+
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
